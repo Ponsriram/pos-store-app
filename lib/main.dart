@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/provider/current_user_provider.dart';
 import 'core/provider/theme_provider.dart';
 import 'features/auth/view/screen/login_page.dart';
-import 'features/home/view/home_page.dart';
+import 'features/home/view/screen/home_page.dart';
 import 'init_dependencies.dart';
 
 void main() async {

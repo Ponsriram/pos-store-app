@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/show_snackbar.dart';
-import '../../../home/view/home_page.dart';
+import '../../../home/view/screen/home_page.dart';
 import '../../viewmodel/auth_viewmodel.dart';
 import '../widgets/login_form.dart';
 import '../widgets/login_left_panel.dart';
