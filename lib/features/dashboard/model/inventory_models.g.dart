@@ -200,3 +200,241 @@ Map<String, dynamic> _$InventoryLocationToJson(_InventoryLocation instance) =>
       'is_active': instance.isActive,
       'created_at': instance.createdAt?.toIso8601String(),
     };
+
+_InventoryUnitCreate _$InventoryUnitCreateFromJson(Map<String, dynamic> json) =>
+    _InventoryUnitCreate(
+      storeId: json['store_id'] as String,
+      name: json['name'] as String,
+      abbreviation: json['abbreviation'] as String,
+      conversionFactor: (json['conversion_factor'] as num?)?.toDouble() ?? 1.0,
+    );
+
+Map<String, dynamic> _$InventoryUnitCreateToJson(
+  _InventoryUnitCreate instance,
+) => <String, dynamic>{
+  'store_id': instance.storeId,
+  'name': instance.name,
+  'abbreviation': instance.abbreviation,
+  'conversion_factor': instance.conversionFactor,
+};
+
+_InventoryLocationCreate _$InventoryLocationCreateFromJson(
+  Map<String, dynamic> json,
+) => _InventoryLocationCreate(
+  storeId: json['store_id'] as String,
+  name: json['name'] as String,
+  description: json['description'] as String?,
+  isActive: json['is_active'] as bool? ?? true,
+);
+
+Map<String, dynamic> _$InventoryLocationCreateToJson(
+  _InventoryLocationCreate instance,
+) => <String, dynamic>{
+  'store_id': instance.storeId,
+  'name': instance.name,
+  'description': instance.description,
+  'is_active': instance.isActive,
+};
+
+_ItemAvailabilityUpdate _$ItemAvailabilityUpdateFromJson(
+  Map<String, dynamic> json,
+) => _ItemAvailabilityUpdate(isActive: json['is_active'] as bool);
+
+Map<String, dynamic> _$ItemAvailabilityUpdateToJson(
+  _ItemAvailabilityUpdate instance,
+) => <String, dynamic>{'is_active': instance.isActive};
+
+_RecipeIngredient _$RecipeIngredientFromJson(Map<String, dynamic> json) =>
+    _RecipeIngredient(
+      id: json['id'] as String,
+      recipeId: json['recipe_id'] as String,
+      itemId: json['item_id'] as String,
+      itemName: json['item_name'] as String?,
+      unitName: json['unit_name'] as String?,
+      quantity: (json['quantity'] as num).toDouble(),
+      notes: json['notes'] as String?,
+    );
+
+Map<String, dynamic> _$RecipeIngredientToJson(_RecipeIngredient instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'recipe_id': instance.recipeId,
+      'item_id': instance.itemId,
+      'item_name': instance.itemName,
+      'unit_name': instance.unitName,
+      'quantity': instance.quantity,
+      'notes': instance.notes,
+    };
+
+_RecipeIngredientCreate _$RecipeIngredientCreateFromJson(
+  Map<String, dynamic> json,
+) => _RecipeIngredientCreate(
+  itemId: json['item_id'] as String,
+  quantity: (json['quantity'] as num).toDouble(),
+  notes: json['notes'] as String?,
+);
+
+Map<String, dynamic> _$RecipeIngredientCreateToJson(
+  _RecipeIngredientCreate instance,
+) => <String, dynamic>{
+  'item_id': instance.itemId,
+  'quantity': instance.quantity,
+  'notes': instance.notes,
+};
+
+_Recipe _$RecipeFromJson(Map<String, dynamic> json) => _Recipe(
+  id: json['id'] as String,
+  name: json['name'] as String,
+  description: json['description'] as String?,
+  productId: json['product_id'] as String?,
+  ingredients:
+      (json['ingredients'] as List<dynamic>?)
+          ?.map((e) => RecipeIngredient.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
+  createdAt: json['created_at'] == null
+      ? null
+      : DateTime.parse(json['created_at'] as String),
+  updatedAt: json['updated_at'] == null
+      ? null
+      : DateTime.parse(json['updated_at'] as String),
+);
+
+Map<String, dynamic> _$RecipeToJson(_Recipe instance) => <String, dynamic>{
+  'id': instance.id,
+  'name': instance.name,
+  'description': instance.description,
+  'product_id': instance.productId,
+  'ingredients': instance.ingredients,
+  'created_at': instance.createdAt?.toIso8601String(),
+  'updated_at': instance.updatedAt?.toIso8601String(),
+};
+
+_RecipeCreate _$RecipeCreateFromJson(Map<String, dynamic> json) =>
+    _RecipeCreate(
+      name: json['name'] as String,
+      description: json['description'] as String?,
+      productId: json['product_id'] as String?,
+      ingredients:
+          (json['ingredients'] as List<dynamic>?)
+              ?.map(
+                (e) =>
+                    RecipeIngredientCreate.fromJson(e as Map<String, dynamic>),
+              )
+              .toList() ??
+          const [],
+    );
+
+Map<String, dynamic> _$RecipeCreateToJson(_RecipeCreate instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'description': instance.description,
+      'product_id': instance.productId,
+      'ingredients': instance.ingredients,
+    };
+
+_RecipeUpdate _$RecipeUpdateFromJson(Map<String, dynamic> json) =>
+    _RecipeUpdate(
+      name: json['name'] as String?,
+      description: json['description'] as String?,
+      productId: json['product_id'] as String?,
+      ingredients: (json['ingredients'] as List<dynamic>?)
+          ?.map(
+            (e) => RecipeIngredientCreate.fromJson(e as Map<String, dynamic>),
+          )
+          .toList(),
+    );
+
+Map<String, dynamic> _$RecipeUpdateToJson(_RecipeUpdate instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'description': instance.description,
+      'product_id': instance.productId,
+      'ingredients': instance.ingredients,
+    };
+
+_InventoryTransfer _$InventoryTransferFromJson(Map<String, dynamic> json) =>
+    _InventoryTransfer(
+      id: json['id'] as String,
+      storeId: json['store_id'] as String,
+      fromLocationId: json['from_location_id'] as String,
+      fromLocationName: json['from_location_name'] as String?,
+      toLocationId: json['to_location_id'] as String,
+      toLocationName: json['to_location_name'] as String?,
+      itemId: json['item_id'] as String,
+      itemName: json['item_name'] as String?,
+      quantity: (json['quantity'] as num).toDouble(),
+      status: json['status'] as String? ?? 'pending',
+      notes: json['notes'] as String?,
+      createdAt: json['created_at'] == null
+          ? null
+          : DateTime.parse(json['created_at'] as String),
+    );
+
+Map<String, dynamic> _$InventoryTransferToJson(_InventoryTransfer instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'store_id': instance.storeId,
+      'from_location_id': instance.fromLocationId,
+      'from_location_name': instance.fromLocationName,
+      'to_location_id': instance.toLocationId,
+      'to_location_name': instance.toLocationName,
+      'item_id': instance.itemId,
+      'item_name': instance.itemName,
+      'quantity': instance.quantity,
+      'status': instance.status,
+      'notes': instance.notes,
+      'created_at': instance.createdAt?.toIso8601String(),
+    };
+
+_TransferCreate _$TransferCreateFromJson(Map<String, dynamic> json) =>
+    _TransferCreate(
+      storeId: json['store_id'] as String,
+      fromLocationId: json['from_location_id'] as String,
+      toLocationId: json['to_location_id'] as String,
+      itemId: json['item_id'] as String,
+      quantity: (json['quantity'] as num).toDouble(),
+      notes: json['notes'] as String?,
+    );
+
+Map<String, dynamic> _$TransferCreateToJson(_TransferCreate instance) =>
+    <String, dynamic>{
+      'store_id': instance.storeId,
+      'from_location_id': instance.fromLocationId,
+      'to_location_id': instance.toLocationId,
+      'item_id': instance.itemId,
+      'quantity': instance.quantity,
+      'notes': instance.notes,
+    };
+
+_TransferStatusUpdate _$TransferStatusUpdateFromJson(
+  Map<String, dynamic> json,
+) => _TransferStatusUpdate(status: json['status'] as String);
+
+Map<String, dynamic> _$TransferStatusUpdateToJson(
+  _TransferStatusUpdate instance,
+) => <String, dynamic>{'status': instance.status};
+
+_OutOfStockItem _$OutOfStockItemFromJson(Map<String, dynamic> json) =>
+    _OutOfStockItem(
+      id: json['id'] as String,
+      itemId: json['item_id'] as String,
+      itemName: json['item_name'] as String,
+      unitName: json['unit_name'] as String?,
+      locationName: json['location_name'] as String?,
+      reason: json['reason'] as String?,
+      reportedAt: json['reported_at'] == null
+          ? null
+          : DateTime.parse(json['reported_at'] as String),
+    );
+
+Map<String, dynamic> _$OutOfStockItemToJson(_OutOfStockItem instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'item_id': instance.itemId,
+      'item_name': instance.itemName,
+      'unit_name': instance.unitName,
+      'location_name': instance.locationName,
+      'reason': instance.reason,
+      'reported_at': instance.reportedAt?.toIso8601String(),
+    };
