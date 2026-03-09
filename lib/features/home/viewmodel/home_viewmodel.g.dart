@@ -174,7 +174,7 @@ final class ActiveOrdersProvider
   ActiveOrders create() => ActiveOrders();
 }
 
-String _$activeOrdersHash() => r'4449b50481742daee50777aff1afbdacf8ea7129';
+String _$activeOrdersHash() => r'38c0faa513591f6a92b84a68a7abb0ba9b3404b3';
 
 abstract class _$ActiveOrders extends $AsyncNotifier<List<Order>> {
   FutureOr<List<Order>> build();
