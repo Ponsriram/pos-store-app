@@ -28,6 +28,14 @@ class ApiEndpoints {
   static String orderPayments(String orderId) => 'orders/$orderId/payments';
   static const String payments = 'orders/payments';
 
+  // Employees
+  static const String employees = 'employees';
+
+  // Shifts
+  static const String shifts = 'shifts';
+  static String shiftById(String shiftId) => 'shifts/$shiftId';
+  static String shiftClose(String shiftId) => 'shifts/$shiftId/close';
+
   // Inventory
   static const String inventoryItems = 'inventory/items';
   static String inventoryItemById(String itemId) => 'inventory/items/$itemId';
