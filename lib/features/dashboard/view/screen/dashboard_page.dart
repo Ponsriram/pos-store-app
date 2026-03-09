@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'employees_page.dart';
 import 'inventory_page.dart';
 import 'products_page.dart';
 import 'sales_page.dart';
+import 'shifts_page.dart';
 import 'stores_page.dart';
 
 /// Dashboard shell — handles internal navigation between the 4 modules.
@@ -16,7 +18,7 @@ class DashboardPage extends ConsumerStatefulWidget {
 
 class _DashboardPageState extends ConsumerState<DashboardPage> {
   /// null  → dashboard home (grid)
-  /// 0–3   → Stores, Products, Inventory, Sales
+  /// 0–5   → Stores, Products, Inventory, Sales, Employees, Shifts
   int? _activeModule;
 
   void _openModule(int index) => setState(() => _activeModule = index);
@@ -36,7 +38,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
   // ─── Top bar with title + breadcrumb back button ──────────────────────
   Widget _buildTopBar(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final titles = ['Stores', 'Products', 'Inventory', 'Sales'];
+    final titles = ['Stores', 'Products', 'Inventory', 'Sales', 'Employees', 'Shifts'];
     return Container(
       height: 56,
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -70,6 +72,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
       1 => const ProductsPage(),
       2 => const InventoryPage(),
       3 => const SalesPage(),
+      4 => const EmployeesPage(),
+      5 => const ShiftsPage(),
       _ => const SizedBox.shrink(),
     };
   }
@@ -99,6 +103,16 @@ class _DashboardHome extends StatelessWidget {
       Icons.point_of_sale,
       'Sales',
       'View orders, payments & sales history',
+    ),
+    _ModuleInfo(
+      Icons.people,
+      'Employees',
+      'Manage staff members',
+    ),
+    _ModuleInfo(
+      Icons.schedule,
+      'Shift Management',
+      'Manage shift timings and cash sessions',
     ),
   ];
 
