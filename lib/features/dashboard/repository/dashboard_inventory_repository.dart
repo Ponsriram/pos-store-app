@@ -258,4 +258,262 @@ class DashboardInventoryRepository {
       return Left(Failure('Failed to fetch locations: $e'));
     }
   }
+
+  // ---- Create Unit ----
+
+  Future<Either<Failure, InventoryUnit>> createUnit(
+    InventoryUnitCreate unit,
+  ) async {
+    try {
+      if (!await connectionChecker.isConnected) {
+        return const Left(Failure('No internet connection.'));
+      }
+      final uri = _buildUri(ApiEndpoints.inventoryUnits);
+      final response = await client.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(unit.toJson()),
+      );
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        final message = parsePydanticError(response.body);
+        return Left(Failure(message, response.statusCode));
+      }
+      final created = InventoryUnit.fromJson(
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
+      return Right(created);
+    } on SocketException {
+      return const Left(Failure('No internet connection.'));
+    } catch (e) {
+      return Left(Failure('Failed to create unit: $e'));
+    }
+  }
+
+  // ---- Create Location ----
+
+  Future<Either<Failure, InventoryLocation>> createLocation(
+    InventoryLocationCreate location,
+  ) async {
+    try {
+      if (!await connectionChecker.isConnected) {
+        return const Left(Failure('No internet connection.'));
+      }
+      final uri = _buildUri(ApiEndpoints.inventoryLocations);
+      final response = await client.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(location.toJson()),
+      );
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        final message = parsePydanticError(response.body);
+        return Left(Failure(message, response.statusCode));
+      }
+      final created = InventoryLocation.fromJson(
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
+      return Right(created);
+    } on SocketException {
+      return const Left(Failure('No internet connection.'));
+    } catch (e) {
+      return Left(Failure('Failed to create location: $e'));
+    }
+  }
+
+  // ---- Toggle Item Availability ----
+
+  Future<Either<Failure, InventoryItem>> toggleItemAvailability(
+    String itemId,
+    bool isActive,
+  ) async {
+    try {
+      if (!await connectionChecker.isConnected) {
+        return const Left(Failure('No internet connection.'));
+      }
+      final uri = _buildUri(ApiEndpoints.inventoryItemAvailability(itemId));
+      final response = await client.put(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(ItemAvailabilityUpdate(isActive: isActive).toJson()),
+      );
+      if (response.statusCode != 200) {
+        final message = parsePydanticError(response.body);
+        return Left(Failure(message, response.statusCode));
+      }
+      final updated = InventoryItem.fromJson(
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
+      return Right(updated);
+    } on SocketException {
+      return const Left(Failure('No internet connection.'));
+    } catch (e) {
+      return Left(Failure('Failed to update item availability: $e'));
+    }
+  }
+
+  // ---- Recipes ----
+
+  Future<Either<Failure, Recipe>> getRecipe(String recipeId) async {
+    try {
+      if (!await connectionChecker.isConnected) {
+        return const Left(Failure('No internet connection.'));
+      }
+      final uri = _buildUri(ApiEndpoints.inventoryRecipeById(recipeId));
+      final response = await client.get(uri);
+      if (response.statusCode != 200) {
+        final message = parsePydanticError(response.body);
+        return Left(Failure(message, response.statusCode));
+      }
+      final recipe = Recipe.fromJson(
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
+      return Right(recipe);
+    } on SocketException {
+      return const Left(Failure('No internet connection.'));
+    } catch (e) {
+      return Left(Failure('Failed to fetch recipe: $e'));
+    }
+  }
+
+  Future<Either<Failure, Recipe>> createRecipe(RecipeCreate recipe) async {
+    try {
+      if (!await connectionChecker.isConnected) {
+        return const Left(Failure('No internet connection.'));
+      }
+      final uri = _buildUri(ApiEndpoints.inventoryRecipes);
+      final response = await client.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(recipe.toJson()),
+      );
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        final message = parsePydanticError(response.body);
+        return Left(Failure(message, response.statusCode));
+      }
+      final created = Recipe.fromJson(
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
+      return Right(created);
+    } on SocketException {
+      return const Left(Failure('No internet connection.'));
+    } catch (e) {
+      return Left(Failure('Failed to create recipe: $e'));
+    }
+  }
+
+  Future<Either<Failure, Recipe>> updateRecipe(
+    String recipeId,
+    RecipeUpdate update,
+  ) async {
+    try {
+      if (!await connectionChecker.isConnected) {
+        return const Left(Failure('No internet connection.'));
+      }
+      final uri = _buildUri(ApiEndpoints.inventoryRecipeById(recipeId));
+      final response = await client.put(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(update.toJson()),
+      );
+      if (response.statusCode != 200) {
+        final message = parsePydanticError(response.body);
+        return Left(Failure(message, response.statusCode));
+      }
+      final updated = Recipe.fromJson(
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
+      return Right(updated);
+    } on SocketException {
+      return const Left(Failure('No internet connection.'));
+    } catch (e) {
+      return Left(Failure('Failed to update recipe: $e'));
+    }
+  }
+
+  // ---- Transfers ----
+
+  Future<Either<Failure, InventoryTransfer>> createTransfer(
+    TransferCreate transfer,
+  ) async {
+    try {
+      if (!await connectionChecker.isConnected) {
+        return const Left(Failure('No internet connection.'));
+      }
+      final uri = _buildUri(ApiEndpoints.inventoryTransfers);
+      final response = await client.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(transfer.toJson()),
+      );
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        final message = parsePydanticError(response.body);
+        return Left(Failure(message, response.statusCode));
+      }
+      final created = InventoryTransfer.fromJson(
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
+      return Right(created);
+    } on SocketException {
+      return const Left(Failure('No internet connection.'));
+    } catch (e) {
+      return Left(Failure('Failed to create transfer: $e'));
+    }
+  }
+
+  Future<Either<Failure, InventoryTransfer>> updateTransferStatus(
+    String transferId,
+    String status,
+  ) async {
+    try {
+      if (!await connectionChecker.isConnected) {
+        return const Left(Failure('No internet connection.'));
+      }
+      final uri = _buildUri(ApiEndpoints.inventoryTransferStatus(transferId));
+      final response = await client.put(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(TransferStatusUpdate(status: status).toJson()),
+      );
+      if (response.statusCode != 200) {
+        final message = parsePydanticError(response.body);
+        return Left(Failure(message, response.statusCode));
+      }
+      final updated = InventoryTransfer.fromJson(
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
+      return Right(updated);
+    } on SocketException {
+      return const Left(Failure('No internet connection.'));
+    } catch (e) {
+      return Left(Failure('Failed to update transfer status: $e'));
+    }
+  }
+
+  // ---- Out Of Stock ----
+
+  Future<Either<Failure, List<OutOfStockItem>>> getOutOfStockItems({
+    required String storeId,
+  }) async {
+    try {
+      if (!await connectionChecker.isConnected) {
+        return const Left(Failure('No internet connection.'));
+      }
+      final uri = _buildUri(ApiEndpoints.inventoryOutOfStock, {
+        'store_id': storeId,
+      });
+      final response = await client.get(uri);
+      if (response.statusCode != 200) {
+        final message = parsePydanticError(response.body);
+        return Left(Failure(message, response.statusCode));
+      }
+      final List<dynamic> data = jsonDecode(response.body) as List<dynamic>;
+      final items = data
+          .map((e) => OutOfStockItem.fromJson(e as Map<String, dynamic>))
+          .toList();
+      return Right(items);
+    } on SocketException {
+      return const Left(Failure('No internet connection.'));
+    } catch (e) {
+      return Left(Failure('Failed to fetch out-of-stock items: $e'));
+    }
+  }
 }
