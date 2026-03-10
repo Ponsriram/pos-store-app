@@ -11,8 +11,7 @@ class ApiEndpoints {
 
   // Stores
   static const String stores = 'stores';
-  static const String storesTerminals = 'stores/terminals';
-  static const String storesTables = 'stores/tables';
+  static String storeById(String storeId) => 'stores/$storeId';
   static String storeTables(String storeId) => 'stores/$storeId/tables';
 
   // Products
