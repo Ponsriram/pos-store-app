@@ -33,6 +33,14 @@ class DashboardProductList extends _$DashboardProductList {
   Future<void> refresh() async {
     ref.invalidateSelf();
   }
+
+  /// Optimistically removes a product from the current list without re-fetching.
+  void removeProduct(String productId) {
+    final current = state;
+    if (current is AsyncData<List<Product>>) {
+      state = AsyncData(current.value.where((p) => p.id != productId).toList());
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -91,6 +99,7 @@ class CreateProductAction extends _$CreateProductAction {
       (_) {
         state = const AsyncData(null);
         ref.invalidate(dashboardProductListProvider);
+        ref.invalidate(dashboardCategoryListProvider);
         return true;
       },
     );
@@ -110,6 +119,7 @@ class UpdateProductAction extends _$UpdateProductAction {
     state = const AsyncLoading();
     final repo = ref.read(dashboardProductRepositoryProvider);
     final result = await repo.updateProduct(productId, update);
+    if (!ref.mounted) return result.isRight();
     return result.fold(
       (failure) {
         state = AsyncError(failure.message, StackTrace.current);
@@ -117,7 +127,35 @@ class UpdateProductAction extends _$UpdateProductAction {
       },
       (_) {
         state = const AsyncData(null);
-        ref.invalidate(dashboardProductListProvider);
+        return true;
+      },
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Delete Product (soft delete)
+// ---------------------------------------------------------------------------
+
+@riverpod
+class DeleteProductAction extends _$DeleteProductAction {
+  @override
+  AsyncValue<void> build() => const AsyncData(null);
+
+  Future<bool> deleteProduct(String productId) async {
+    state = const AsyncLoading();
+    final repo = ref.read(dashboardProductRepositoryProvider);
+    final result = await repo.deleteProduct(productId);
+    if (!ref.mounted) {
+      return result.isRight();
+    }
+    return result.fold(
+      (failure) {
+        state = AsyncError(failure.message, StackTrace.current);
+        return false;
+      },
+      (_) {
+        state = const AsyncData(null);
         return true;
       },
     );
@@ -145,7 +183,53 @@ class CreateCategoryAction extends _$CreateCategoryAction {
       (_) {
         state = const AsyncData(null);
         ref.invalidate(dashboardCategoryListProvider);
+        ref.invalidate(dashboardProductListProvider);
         return true;
+      },
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Delete Category
+// ---------------------------------------------------------------------------
+
+@riverpod
+class DeleteCategoryAction extends _$DeleteCategoryAction {
+  @override
+  AsyncValue<void> build() => const AsyncData(null);
+
+  /// Returns a tuple-like result: true = success, false = generic failure.
+  /// When the backend returns 409, the failure message contains `409` info
+  /// so the UI can show a special dialog.
+  Future<({bool success, bool isConflict, String? errorMessage})>
+  deleteCategory(String categoryId) async {
+    state = const AsyncLoading();
+    final repo = ref.read(dashboardProductRepositoryProvider);
+    final result = await repo.deleteCategory(categoryId);
+    // Guard: provider may have been disposed while the request was in-flight.
+    if (!ref.mounted) {
+      return result.fold(
+        (failure) => (
+          success: false,
+          isConflict: failure.statusCode == 409,
+          errorMessage: failure.message,
+        ),
+        (_) => (success: true, isConflict: false, errorMessage: null),
+      );
+    }
+    return result.fold(
+      (failure) {
+        state = AsyncError(failure.message, StackTrace.current);
+        return (
+          success: false,
+          isConflict: failure.statusCode == 409,
+          errorMessage: failure.message,
+        );
+      },
+      (_) {
+        state = const AsyncData(null);
+        return (success: true, isConflict: false, errorMessage: null);
       },
     );
   }

@@ -196,4 +196,54 @@ class DashboardProductRepository {
       return Left(Failure('Failed to create category: $e'));
     }
   }
+
+  Future<Either<Failure, void>> deleteCategory(String categoryId) async {
+    try {
+      if (!await connectionChecker.isConnected) {
+        return const Left(Failure('No internet connection.'));
+      }
+
+      final uri = _buildUri(ApiEndpoints.categoryById(categoryId));
+      final response = await client.delete(uri);
+
+      if (response.statusCode == 204 || response.statusCode == 200) {
+        return const Right(null);
+      }
+
+      if (response.statusCode == 409) {
+        return const Left(
+          Failure('Products are still assigned to this category.', 409),
+        );
+      }
+
+      final message = parsePydanticError(response.body);
+      return Left(Failure(message, response.statusCode));
+    } on SocketException {
+      return const Left(Failure('No internet connection.'));
+    } catch (e) {
+      return Left(Failure('Failed to delete category: $e'));
+    }
+  }
+
+  Future<Either<Failure, void>> deleteProduct(String productId) async {
+    try {
+      if (!await connectionChecker.isConnected) {
+        return const Left(Failure('No internet connection.'));
+      }
+
+      final uri = _buildUri(ApiEndpoints.productById(productId));
+      final response = await client.delete(uri);
+
+      if (response.statusCode == 204 || response.statusCode == 200) {
+        return const Right(null);
+      }
+
+      final message = parsePydanticError(response.body);
+      return Left(Failure(message, response.statusCode));
+    } on SocketException {
+      return const Left(Failure('No internet connection.'));
+    } catch (e) {
+      return Left(Failure('Failed to delete product: $e'));
+    }
+  }
 }

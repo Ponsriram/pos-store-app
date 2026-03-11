@@ -186,7 +186,7 @@ final class CreateProductActionProvider
 }
 
 String _$createProductActionHash() =>
-    r'4781450b6a5fd98f49ccb0bcd8403c64282292c6';
+    r'bb7780248f4c9a8889bacd7d4115afd5d9cb5d90';
 
 abstract class _$CreateProductAction extends $Notifier<AsyncValue<void>> {
   AsyncValue<void> build();
@@ -259,6 +259,59 @@ abstract class _$UpdateProductAction extends $Notifier<AsyncValue<void>> {
   }
 }
 
+@ProviderFor(DeleteProductAction)
+final deleteProductActionProvider = DeleteProductActionProvider._();
+
+final class DeleteProductActionProvider
+    extends $NotifierProvider<DeleteProductAction, AsyncValue<void>> {
+  DeleteProductActionProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'deleteProductActionProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$deleteProductActionHash();
+
+  @$internal
+  @override
+  DeleteProductAction create() => DeleteProductAction();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(AsyncValue<void> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<AsyncValue<void>>(value),
+    );
+  }
+}
+
+String _$deleteProductActionHash() =>
+    r'c525991e6d19de5dda159c8f772defc04c73f85c';
+
+abstract class _$DeleteProductAction extends $Notifier<AsyncValue<void>> {
+  AsyncValue<void> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<void>, AsyncValue<void>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<void>, AsyncValue<void>>,
+              AsyncValue<void>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
 @ProviderFor(CreateCategoryAction)
 final createCategoryActionProvider = CreateCategoryActionProvider._();
 
@@ -292,9 +345,62 @@ final class CreateCategoryActionProvider
 }
 
 String _$createCategoryActionHash() =>
-    r'5c09a2355da7e0270579b356964944b605124d1a';
+    r'42c2baa988c107a35c8cd844ff975575b5ac7816';
 
 abstract class _$CreateCategoryAction extends $Notifier<AsyncValue<void>> {
+  AsyncValue<void> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<void>, AsyncValue<void>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<void>, AsyncValue<void>>,
+              AsyncValue<void>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(DeleteCategoryAction)
+final deleteCategoryActionProvider = DeleteCategoryActionProvider._();
+
+final class DeleteCategoryActionProvider
+    extends $NotifierProvider<DeleteCategoryAction, AsyncValue<void>> {
+  DeleteCategoryActionProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'deleteCategoryActionProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$deleteCategoryActionHash();
+
+  @$internal
+  @override
+  DeleteCategoryAction create() => DeleteCategoryAction();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(AsyncValue<void> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<AsyncValue<void>>(value),
+    );
+  }
+}
+
+String _$deleteCategoryActionHash() =>
+    r'835f2c7112fa0b61754783ba51e50c20869e0920';
+
+abstract class _$DeleteCategoryAction extends $Notifier<AsyncValue<void>> {
   AsyncValue<void> build();
   @$mustCallSuper
   @override

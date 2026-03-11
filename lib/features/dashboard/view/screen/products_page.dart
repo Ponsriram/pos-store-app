@@ -128,9 +128,103 @@ class _CategoryFilterChips extends ConsumerWidget {
             onSelected: (_) => ref
                 .read(dashboardProductCategoryFilterProvider.notifier)
                 .select(cat.id),
+            deleteIcon: const Icon(Icons.close, size: 16),
+            onDeleted: () => _confirmDeleteCategory(context, ref, cat),
           ),
         ),
       ],
+    );
+  }
+
+  void _confirmDeleteCategory(
+    BuildContext context,
+    WidgetRef ref,
+    Category category,
+  ) {
+    // Client-side guard: block deletion if products still belong to this category.
+    final productsAsync = ref.read(dashboardProductListProvider);
+    final hasProducts =
+        productsAsync.asData?.value.any((p) => p.categoryId == category.id) ??
+        false;
+
+    if (hasProducts) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Cannot Delete Category'),
+          content: const Text(
+            'Products are still assigned to this category. '
+            'Please delete or reassign those products first.',
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Category?'),
+        content: const Text('This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              final result = await ref
+                  .read(deleteCategoryActionProvider.notifier)
+                  .deleteCategory(category.id);
+              if (!context.mounted) return;
+              if (result.success) {
+                ref.invalidate(dashboardCategoryListProvider);
+                ref.invalidate(dashboardProductListProvider);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Category deleted successfully'),
+                  ),
+                );
+              } else if (result.isConflict) {
+                showDialog(
+                  context: context,
+                  builder: (ctx2) => AlertDialog(
+                    title: const Text('Cannot delete category'),
+                    content: const Text(
+                      'Products are still assigned to this category.',
+                    ),
+                    actions: [
+                      FilledButton(
+                        onPressed: () => Navigator.of(ctx2).pop(),
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      result.errorMessage ?? 'Failed to delete category',
+                    ),
+                  ),
+                );
+              }
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -162,18 +256,33 @@ class _ProductsDataTable extends ConsumerWidget {
             ),
             columns: const [
               DataColumn(label: Text('Name')),
+              DataColumn(label: Text('Description')),
               DataColumn(label: Text('Price'), numeric: true),
               DataColumn(label: Text('Tax %'), numeric: true),
               DataColumn(label: Text('Status')),
               DataColumn(label: Text('Actions')),
             ],
             rows: products.map((p) {
+              final desc = p.description ?? '';
+              final truncatedDesc = desc.length > 40
+                  ? '${desc.substring(0, 40)}...'
+                  : desc;
+
               return DataRow(
                 cells: [
                   DataCell(
                     Text(
                       p.name,
                       style: const TextStyle(fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                  DataCell(
+                    Text(
+                      truncatedDesc,
+                      style: TextStyle(
+                        color: cs.onSurfaceVariant,
+                        fontSize: 13,
+                      ),
                     ),
                   ),
                   DataCell(Text(p.price.toStringAsFixed(2))),
@@ -200,10 +309,26 @@ class _ProductsDataTable extends ConsumerWidget {
                     ),
                   ),
                   DataCell(
-                    IconButton(
-                      icon: const Icon(Icons.edit_outlined, size: 20),
-                      tooltip: 'Edit',
-                      onPressed: () => _showEditProductDialog(context, ref, p),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.edit_outlined, size: 20),
+                          tooltip: 'Edit',
+                          onPressed: () =>
+                              _showEditProductDialog(context, ref, p),
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            Icons.delete_outline,
+                            size: 20,
+                            color: cs.error,
+                          ),
+                          tooltip: 'Delete',
+                          onPressed: () =>
+                              _confirmDeleteProduct(context, ref, p),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -223,6 +348,54 @@ class _ProductsDataTable extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (_) => _EditProductDialog(ref: ref, product: product),
+    );
+  }
+
+  void _confirmDeleteProduct(
+    BuildContext context,
+    WidgetRef ref,
+    Product product,
+  ) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Product?'),
+        content: const Text('This product will be permanently removed.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              final success = await ref
+                  .read(deleteProductActionProvider.notifier)
+                  .deleteProduct(product.id);
+              if (!context.mounted) return;
+              if (success) {
+                // Optimistically remove from list — no full re-fetch needed.
+                ref
+                    .read(dashboardProductListProvider.notifier)
+                    .removeProduct(product.id);
+              }
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    success
+                        ? 'Product deleted successfully'
+                        : 'Failed to delete product',
+                  ),
+                ),
+              );
+            },
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -275,7 +448,14 @@ class _CreateProductDialogState extends ConsumerState<_CreateProductDialog> {
     final success = await ref
         .read(createProductActionProvider.notifier)
         .createProduct(product);
-    if (success && mounted) Navigator.of(context).pop();
+    if (success && mounted) {
+      Navigator.of(context).pop();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Product created successfully')),
+        );
+      }
+    }
   }
 
   @override
@@ -453,7 +633,15 @@ class _EditProductDialogState extends ConsumerState<_EditProductDialog> {
     final success = await ref
         .read(updateProductActionProvider.notifier)
         .updateProduct(widget.product.id, update);
-    if (success && mounted) Navigator.of(context).pop();
+    if (success && mounted) {
+      ref.invalidate(dashboardProductListProvider);
+      Navigator.of(context).pop();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Product updated successfully')),
+        );
+      }
+    }
   }
 
   @override
@@ -598,7 +786,14 @@ class _CreateCategoryDialogState extends ConsumerState<_CreateCategoryDialog> {
     final success = await ref
         .read(createCategoryActionProvider.notifier)
         .createCategory(category);
-    if (success && mounted) Navigator.of(context).pop();
+    if (success && mounted) {
+      Navigator.of(context).pop();
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Category created successfully')),
+        );
+      }
+    }
   }
 
   @override
