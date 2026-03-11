@@ -150,6 +150,102 @@ abstract class _$ProductList extends $AsyncNotifier<List<Product>> {
   }
 }
 
+/// All products for the current store (no category filter) — used for name lookups.
+
+@ProviderFor(AllProducts)
+final allProductsProvider = AllProductsProvider._();
+
+/// All products for the current store (no category filter) — used for name lookups.
+final class AllProductsProvider
+    extends $AsyncNotifierProvider<AllProducts, List<Product>> {
+  /// All products for the current store (no category filter) — used for name lookups.
+  AllProductsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'allProductsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$allProductsHash();
+
+  @$internal
+  @override
+  AllProducts create() => AllProducts();
+}
+
+String _$allProductsHash() => r'beafc1d35498ea2d5435800a4efdc717ec22c286';
+
+/// All products for the current store (no category filter) — used for name lookups.
+
+abstract class _$AllProducts extends $AsyncNotifier<List<Product>> {
+  FutureOr<List<Product>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<List<Product>>, List<Product>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<List<Product>>, List<Product>>,
+              AsyncValue<List<Product>>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
+/// Maps product ID → Product for fast lookups.
+
+@ProviderFor(productMap)
+final productMapProvider = ProductMapProvider._();
+
+/// Maps product ID → Product for fast lookups.
+
+final class ProductMapProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<Map<String, Product>>,
+          Map<String, Product>,
+          FutureOr<Map<String, Product>>
+        >
+    with
+        $FutureModifier<Map<String, Product>>,
+        $FutureProvider<Map<String, Product>> {
+  /// Maps product ID → Product for fast lookups.
+  ProductMapProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'productMapProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$productMapHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<Map<String, Product>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<Map<String, Product>> create(Ref ref) {
+    return productMap(ref);
+  }
+}
+
+String _$productMapHash() => r'96beef2b06d756bd533cb96b476ddf43f83fd2e2';
+
 @ProviderFor(ActiveOrders)
 final activeOrdersProvider = ActiveOrdersProvider._();
 
@@ -459,6 +555,51 @@ abstract class _$SelectedTable extends $Notifier<DineInTable?> {
   }
 }
 
+@ProviderFor(StoreTables)
+final storeTablesProvider = StoreTablesProvider._();
+
+final class StoreTablesProvider
+    extends $AsyncNotifierProvider<StoreTables, List<DineInTable>> {
+  StoreTablesProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'storeTablesProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$storeTablesHash();
+
+  @$internal
+  @override
+  StoreTables create() => StoreTables();
+}
+
+String _$storeTablesHash() => r'd4d75bca3db933cecfe8bc869b222a6963f4a92b';
+
+abstract class _$StoreTables extends $AsyncNotifier<List<DineInTable>> {
+  FutureOr<List<DineInTable>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref =
+        this.ref as $Ref<AsyncValue<List<DineInTable>>, List<DineInTable>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<List<DineInTable>>, List<DineInTable>>,
+              AsyncValue<List<DineInTable>>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
 @ProviderFor(SelectedPaymentMethod)
 final selectedPaymentMethodProvider = SelectedPaymentMethodProvider._();
 
@@ -544,7 +685,7 @@ final class OrderOperationsProvider
   }
 }
 
-String _$orderOperationsHash() => r'8988d1d6666411c74ed22e0509ab961884940d8c';
+String _$orderOperationsHash() => r'3bf51ee3a0064f800f33508496115b230935dc5a';
 
 abstract class _$OrderOperations extends $Notifier<AsyncValue<void>> {
   AsyncValue<void> build();

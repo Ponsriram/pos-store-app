@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../model/cart_item.dart';
 import '../../viewmodel/home_viewmodel.dart';
-import '../../viewmodel/store_viewmodel.dart';
 
 class OrderSummaryPanel extends ConsumerWidget {
   const OrderSummaryPanel({super.key});
@@ -14,9 +13,7 @@ class OrderSummaryPanel extends ConsumerWidget {
     final textTheme = Theme.of(context).textTheme;
     final cartItems = ref.watch(cartProvider);
     final orderType = ref.watch(selectedOrderTypeProvider);
-    final selectedTable = ref.watch(selectedTableProvider);
     final paymentMethod = ref.watch(selectedPaymentMethodProvider);
-    final store = ref.watch(selectedStoreProvider);
     final orderOps = ref.watch(orderOperationsProvider);
     final currentOrderId = ref.watch(currentOrderIdProvider);
     final currentOrder = ref.watch(currentOrderProvider);
@@ -117,38 +114,7 @@ class OrderSummaryPanel extends ConsumerWidget {
           ),
 
           // Table selection for dine-in
-          if (orderType == 'dine_in' &&
-              store != null &&
-              store.tables.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: DropdownButtonFormField<String>(
-                initialValue: selectedTable?.id,
-                decoration: InputDecoration(
-                  labelText: 'Table',
-                  isDense: true,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                ),
-                items: store.tables
-                    .map(
-                      (t) => DropdownMenuItem(
-                        value: t.id,
-                        child: Text(t.label ?? 'Table ${t.tableNumber}'),
-                      ),
-                    )
-                    .toList(),
-                onChanged: (id) {
-                  final table = store.tables.firstWhere((t) => t.id == id);
-                  ref.read(selectedTableProvider.notifier).select(table);
-                },
-              ),
-            ),
+          if (orderType == 'dine_in') _DineInTableSelector(),
 
           const SizedBox(height: 8),
           Divider(height: 1, color: colorScheme.outlineVariant),
@@ -431,6 +397,76 @@ class _OrderTypeTab extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _DineInTableSelector extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tablesAsync = ref.watch(storeTablesProvider);
+    final selectedTable = ref.watch(selectedTableProvider);
+
+    return tablesAsync.when(
+      loading: () => const Padding(
+        padding: EdgeInsets.symmetric(horizontal: 12),
+        child: LinearProgressIndicator(),
+      ),
+      error: (e, _) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: Text(
+          'Failed to load tables',
+          style: TextStyle(color: Colors.red, fontSize: 12),
+        ),
+      ),
+      data: (tables) {
+        if (tables.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Text(
+              'No tables configured for this store',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          );
+        }
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          child: DropdownButtonFormField<int>(
+            value: selectedTable?.tableNumber,
+            decoration: InputDecoration(
+              labelText: 'Table',
+              isDense: true,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 8,
+              ),
+            ),
+            items: tables
+                .map(
+                  (t) => DropdownMenuItem(
+                    value: t.tableNumber,
+                    child: Text(
+                      t.label.isNotEmpty ? t.label : 'Table ${t.tableNumber}',
+                    ),
+                  ),
+                )
+                .toList(),
+            onChanged: (tableNumber) {
+              if (tableNumber != null) {
+                final table = tables.firstWhere(
+                  (t) => t.tableNumber == tableNumber,
+                );
+                ref.read(selectedTableProvider.notifier).select(table);
+              }
+            },
+          ),
+        );
+      },
     );
   }
 }

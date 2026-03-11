@@ -8,13 +8,13 @@ abstract class KitchenOrderTicket with _$KitchenOrderTicket {
   const factory KitchenOrderTicket({
     required String id,
     @JsonKey(name: 'order_id') required String orderId,
-    @JsonKey(name: 'order_number') @Default('') String orderNumber,
-    @JsonKey(name: 'order_type') @Default('dine_in') String orderType,
-    @JsonKey(name: 'table_label') String? tableLabel,
-    @Default('PENDING') String status,
+    @JsonKey(name: 'store_id') required String storeId,
+    @JsonKey(name: 'kot_number') @Default(0) int kotNumber,
+    @JsonKey(name: 'kitchen_section') String? kitchenSection,
+    @Default('pending') String status,
+    @JsonKey(name: 'reprint_count') @Default(0) int reprintCount,
     @Default([]) List<KotItem> items,
     @JsonKey(name: 'created_at') DateTime? createdAt,
-    @JsonKey(name: 'updated_at') DateTime? updatedAt,
   }) = _KitchenOrderTicket;
 
   factory KitchenOrderTicket.fromJson(Map<String, dynamic> json) =>
@@ -25,6 +25,8 @@ abstract class KitchenOrderTicket with _$KitchenOrderTicket {
 abstract class KotItem with _$KotItem {
   const factory KotItem({
     required String id,
+    @JsonKey(name: 'kot_id') required String kotId,
+    @JsonKey(name: 'order_item_id') required String orderItemId,
     @JsonKey(name: 'product_name') required String productName,
     @Default(1) int quantity,
     String? notes,

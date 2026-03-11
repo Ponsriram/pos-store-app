@@ -10,23 +10,21 @@ _Store _$StoreFromJson(Map<String, dynamic> json) => _Store(
   id: json['id'] as String,
   ownerId: json['owner_id'] as String,
   name: json['name'] as String,
-  address: json['location'] as String? ?? '',
-  city: json['city'] as String? ?? '',
-  phone: json['phone'] as String? ?? '',
-  email: json['email'] as String? ?? '',
-  gstNumber: json['gst_number'] as String?,
+  address: json['location'] as String?,
+  city: json['city'] as String?,
+  state: json['state'] as String?,
+  phone: json['phone'] as String?,
+  email: json['email'] as String?,
+  outletType: json['outlet_type'] as String?,
   currency: json['currency'] as String? ?? 'INR',
   timezone: json['timezone'] as String? ?? 'Asia/Kolkata',
-  numTables: (json['table_count'] as num?)?.toInt() ?? 0,
+  taxInclusive: json['tax_inclusive'] as bool? ?? false,
+  chainId: json['chain_id'] as String?,
+  tableCount: (json['table_count'] as num?)?.toInt() ?? 0,
   isActive: json['is_active'] as bool? ?? true,
   createdAt: json['created_at'] == null
       ? null
       : DateTime.parse(json['created_at'] as String),
-  tables:
-      (json['tables'] as List<dynamic>?)
-          ?.map((e) => DineInTable.fromJson(e as Map<String, dynamic>))
-          .toList() ??
-      const [],
 );
 
 Map<String, dynamic> _$StoreToJson(_Store instance) => <String, dynamic>{
@@ -35,13 +33,15 @@ Map<String, dynamic> _$StoreToJson(_Store instance) => <String, dynamic>{
   'name': instance.name,
   'location': instance.address,
   'city': instance.city,
+  'state': instance.state,
   'phone': instance.phone,
   'email': instance.email,
-  'gst_number': instance.gstNumber,
+  'outlet_type': instance.outletType,
   'currency': instance.currency,
   'timezone': instance.timezone,
-  'table_count': instance.numTables,
+  'tax_inclusive': instance.taxInclusive,
+  'chain_id': instance.chainId,
+  'table_count': instance.tableCount,
   'is_active': instance.isActive,
   'created_at': instance.createdAt?.toIso8601String(),
-  'tables': instance.tables,
 };

@@ -10,6 +10,7 @@ import '../../../core/error/failure.dart';
 import '../../../core/network/connection_checker.dart';
 import '../../../init_dependencies.dart';
 import '../model/store.dart';
+import '../model/table.dart';
 
 part 'store_repository.g.dart';
 
@@ -59,6 +60,32 @@ class StoreRepository {
       return const Left(Failure('No internet connection.'));
     } catch (e) {
       return Left(Failure('Failed to fetch stores: $e'));
+    }
+  }
+
+  Future<Either<Failure, List<DineInTable>>> getStoreTables({
+    required String storeId,
+  }) async {
+    try {
+      if (!await connectionChecker.isConnected) {
+        return const Left(Failure('No internet connection.'));
+      }
+
+      final uri = _buildUri(ApiEndpoints.storeTables(storeId));
+      final response = await client.get(uri);
+
+      if (response.statusCode != 200) {
+        final message = parsePydanticError(response.body);
+        return Left(Failure(message, response.statusCode));
+      }
+
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      final tablesResponse = StoreTablesResponse.fromJson(data);
+      return Right(tablesResponse.tables);
+    } on SocketException {
+      return const Left(Failure('No internet connection.'));
+    } catch (e) {
+      return Left(Failure('Failed to fetch tables: $e'));
     }
   }
 }

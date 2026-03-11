@@ -121,7 +121,7 @@ class _StoresDataTable extends ConsumerWidget {
                   DataCell(Text(store.address ?? '—')),
                   DataCell(Text(store.city ?? '—')),
                   DataCell(Text(store.phone ?? '—')),
-                  DataCell(Text('${store.numTables}')),
+                  DataCell(Text('${store.tableCount}')),
                   DataCell(
                     Row(
                       mainAxisSize: MainAxisSize.min,
@@ -329,7 +329,7 @@ class _EditStoreDialogState extends ConsumerState<_EditStoreDialog> {
     _phoneCtrl = TextEditingController(text: s.phone ?? '');
     _addressCtrl = TextEditingController(text: s.address ?? '');
     _cityCtrl = TextEditingController(text: s.city ?? '');
-    _tablesCtrl = TextEditingController(text: '${s.numTables}');
+    _tablesCtrl = TextEditingController(text: '${s.tableCount}');
   }
 
   @override
