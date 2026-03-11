@@ -189,13 +189,12 @@ class OrderCard extends StatelessWidget {
 
   String _statusLabel(String status) {
     return switch (status) {
-      'pending' => 'Pending',
-      'confirmed' => 'Confirmed',
-      'preparing' || 'in_kitchen' => 'Preparing',
+      'open' => 'Open',
+      'sent_to_kitchen' => 'In Kitchen',
+      'preparing' => 'Preparing',
       'ready' => 'Ready',
-      'served' => 'Served',
-      'delivered' => 'Delivered',
       'completed' => 'Completed',
+      'paid' => 'Paid',
       'cancelled' => 'Cancelled',
       _ => status,
     };
@@ -203,12 +202,12 @@ class OrderCard extends StatelessWidget {
 
   Color _statusColor(String status, ColorScheme cs) {
     return switch (status) {
-      'pending' => Colors.orange,
-      'confirmed' => Colors.blue,
-      'preparing' || 'in_kitchen' => Colors.amber.shade700,
+      'open' => Colors.blue,
+      'sent_to_kitchen' => Colors.orange,
+      'preparing' => Colors.amber.shade700,
       'ready' => Colors.green,
-      'served' || 'delivered' => Colors.teal,
-      'completed' => Colors.grey,
+      'completed' => Colors.teal,
+      'paid' => Colors.grey,
       'cancelled' => cs.error,
       _ => cs.onSurfaceVariant,
     };

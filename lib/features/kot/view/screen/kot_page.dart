@@ -194,7 +194,7 @@ class _KotCard extends ConsumerWidget {
     final ops = ref.watch(kotOperationsProvider);
     final statusColor = _statusColor(ticket.status, colorScheme);
     final dateStr = ticket.createdAt != null
-        ? DateFormat('hh:mm a').format(ticket.createdAt!)
+        ? DateFormat('hh:mm a').format(ticket.createdAt!.toLocal())
         : '';
 
     return Container(
@@ -358,7 +358,7 @@ class _KotCard extends ConsumerWidget {
                           : () async {
                               final success = await ref
                                   .read(kotOperationsProvider.notifier)
-                                  .updateStatus(ticket.id, 'PREPARING');
+                                  .updateStatus(ticket.id, 'preparing');
                               if (!success && context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
@@ -386,7 +386,7 @@ class _KotCard extends ConsumerWidget {
                           : () async {
                               final success = await ref
                                   .read(kotOperationsProvider.notifier)
-                                  .updateStatus(ticket.id, 'READY');
+                                  .updateStatus(ticket.id, 'ready');
                               if (!success && context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(

@@ -374,15 +374,14 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
   // ---- Helpers ----
 
   bool _isTerminalState(String status) =>
-      status == 'completed' || status == 'cancelled';
+      status == 'completed' || status == 'paid' || status == 'cancelled';
 
   String? _nextStatus(String status) {
     return switch (status) {
-      'pending' => 'confirmed',
-      'confirmed' => 'preparing',
-      'preparing' || 'in_kitchen' => 'ready',
-      'ready' => 'served',
-      'served' || 'delivered' => 'completed',
+      'open' => 'sent_to_kitchen',
+      'sent_to_kitchen' => 'preparing',
+      'preparing' => 'ready',
+      'ready' => 'completed',
       _ => null,
     };
   }
@@ -390,10 +389,9 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
   String _nextStatusLabel(String status) {
     final next = _nextStatus(status);
     return switch (next) {
-      'confirmed' => 'Confirm',
+      'sent_to_kitchen' => 'Send to Kitchen',
       'preparing' => 'Start Prep',
       'ready' => 'Mark Ready',
-      'served' => 'Serve',
       'completed' => 'Complete',
       _ => 'Advance',
     };
@@ -401,11 +399,10 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
 
   IconData _nextStatusIcon(String status) {
     return switch (status) {
-      'pending' => Icons.check_circle_outline,
-      'confirmed' => Icons.soup_kitchen_outlined,
-      'preparing' || 'in_kitchen' => Icons.done_all,
-      'ready' => Icons.room_service_outlined,
-      'served' || 'delivered' => Icons.task_alt,
+      'open' => Icons.restaurant_outlined,
+      'sent_to_kitchen' => Icons.soup_kitchen_outlined,
+      'preparing' => Icons.done_all,
+      'ready' => Icons.task_alt,
       _ => Icons.arrow_forward,
     };
   }
@@ -502,24 +499,23 @@ class _StatusBadge extends StatelessWidget {
   }
 
   String _statusLabel(String s) => switch (s) {
-    'pending' => 'Pending',
-    'confirmed' => 'Confirmed',
-    'preparing' || 'in_kitchen' => 'Preparing',
+    'open' => 'Open',
+    'sent_to_kitchen' => 'Sent to Kitchen',
+    'preparing' => 'Preparing',
     'ready' => 'Ready',
-    'served' => 'Served',
-    'delivered' => 'Delivered',
     'completed' => 'Completed',
+    'paid' => 'Paid',
     'cancelled' => 'Cancelled',
     _ => s,
   };
 
   Color _statusColor(String s, ColorScheme cs) => switch (s) {
-    'pending' => Colors.orange,
-    'confirmed' => Colors.blue,
-    'preparing' || 'in_kitchen' => Colors.amber.shade700,
+    'open' => Colors.blue,
+    'sent_to_kitchen' => Colors.orange,
+    'preparing' => Colors.amber.shade700,
     'ready' => Colors.green,
-    'served' || 'delivered' => Colors.teal,
-    'completed' => Colors.grey,
+    'completed' => Colors.teal,
+    'paid' => Colors.grey,
     'cancelled' => cs.error,
     _ => cs.onSurfaceVariant,
   };
