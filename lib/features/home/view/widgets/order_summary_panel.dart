@@ -255,91 +255,181 @@ class OrderSummaryPanel extends ConsumerWidget {
                     ),
                   ),
                 ] else ...[
-                  // Send to Kitchen button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 44,
-                    child: FilledButton.icon(
-                      onPressed: orderOps.isLoading
-                          ? null
-                          : () async {
-                              final success = await ref
-                                  .read(orderOperationsProvider.notifier)
-                                  .sendToKitchen();
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      success
-                                          ? 'Order sent to kitchen!'
-                                          : ref
-                                                    .read(
-                                                      orderOperationsProvider,
-                                                    )
-                                                    .error
-                                                    ?.toString() ??
-                                                'Failed to send to kitchen',
+                  // Show order status when sent to kitchen
+                  if (currentOrder != null &&
+                      currentOrder.status != 'open') ...[
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 6,
+                        horizontal: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _workflowColor(
+                          currentOrder.status,
+                        ).withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            _workflowIcon(currentOrder.status),
+                            size: 18,
+                            color: _workflowColor(currentOrder.status),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            _workflowLabel(currentOrder.status),
+                            style: textTheme.labelLarge?.copyWith(
+                              color: _workflowColor(currentOrder.status),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+
+                  // Send to Kitchen — only when order hasn't been sent yet
+                  if ((currentOrder?.status ?? 'open') == 'open') ...[
+                    SizedBox(
+                      width: double.infinity,
+                      height: 44,
+                      child: FilledButton.icon(
+                        onPressed: orderOps.isLoading
+                            ? null
+                            : () async {
+                                final success = await ref
+                                    .read(orderOperationsProvider.notifier)
+                                    .sendToKitchen();
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        success
+                                            ? 'Order sent to kitchen!'
+                                            : ref
+                                                      .read(
+                                                        orderOperationsProvider,
+                                                      )
+                                                      .error
+                                                      ?.toString() ??
+                                                  'Failed to send to kitchen',
+                                      ),
                                     ),
-                                  ),
-                                );
-                              }
-                            },
-                      icon: const Icon(Icons.restaurant_outlined, size: 18),
-                      label: const Text('Send to Kitchen'),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                                  );
+                                }
+                              },
+                        icon: const Icon(Icons.restaurant_outlined, size: 18),
+                        label: const Text('Send to Kitchen'),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  // Complete Payment button
-                  SizedBox(
-                    width: double.infinity,
-                    height: 44,
-                    child: FilledButton.icon(
-                      onPressed: orderOps.isLoading
-                          ? null
-                          : () async {
-                              final success = await ref
-                                  .read(orderOperationsProvider.notifier)
-                                  .completePayment();
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      success
-                                          ? 'Payment completed!'
-                                          : ref
-                                                    .read(
-                                                      orderOperationsProvider,
-                                                    )
-                                                    .error
-                                                    ?.toString() ??
-                                                'Payment failed',
+                    const SizedBox(height: 8),
+                  ],
+
+                  // Complete Payment — only when not already paid and order has been sent
+                  if (currentOrder?.paymentStatus != 'completed' &&
+                      (currentOrder?.status ?? 'open') != 'open') ...[
+                    SizedBox(
+                      width: double.infinity,
+                      height: 44,
+                      child: FilledButton.icon(
+                        onPressed: orderOps.isLoading
+                            ? null
+                            : () async {
+                                final success = await ref
+                                    .read(orderOperationsProvider.notifier)
+                                    .completePayment();
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        success
+                                            ? 'Payment completed!'
+                                            : ref
+                                                      .read(
+                                                        orderOperationsProvider,
+                                                      )
+                                                      .error
+                                                      ?.toString() ??
+                                                  'Payment failed',
+                                      ),
                                     ),
-                                  ),
-                                );
-                              }
-                            },
-                      icon: orderOps.isLoading
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(Icons.payment_outlined, size: 18),
-                      label: const Text('Complete Payment'),
-                      style: FilledButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                                  );
+                                }
+                              },
+                        icon: orderOps.isLoading
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Icon(Icons.payment_outlined, size: 18),
+                        label: const Text('Complete Payment'),
+                        style: FilledButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  ] else ...[
+                    // Payment completed banner
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.check_circle,
+                            color: Colors.green,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Payment Completed',
+                            style: textTheme.labelLarge?.copyWith(
+                              color: Colors.green,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 44,
+                      child: FilledButton.icon(
+                        onPressed: () => ref
+                            .read(orderOperationsProvider.notifier)
+                            .newOrder(),
+                        icon: const Icon(Icons.add, size: 18),
+                        label: const Text('New Order'),
+                        style: FilledButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ],
             ),
@@ -434,7 +524,7 @@ class _DineInTableSelector extends ConsumerWidget {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: DropdownButtonFormField<int>(
-            value: selectedTable?.tableNumber,
+            initialValue: selectedTable?.tableNumber,
             decoration: InputDecoration(
               labelText: 'Table',
               isDense: true,
@@ -620,4 +710,39 @@ class _TotalRow extends StatelessWidget {
       ],
     );
   }
+}
+
+// ── Workflow status helpers ──────────────────────────────────────────────
+
+Color _workflowColor(String status) {
+  return switch (status) {
+    'sent_to_kitchen' => Colors.orange,
+    'preparing' => Colors.amber.shade700,
+    'ready' => Colors.green,
+    'completed' => Colors.teal,
+    'paid' => Colors.grey.shade600,
+    _ => Colors.grey,
+  };
+}
+
+IconData _workflowIcon(String status) {
+  return switch (status) {
+    'sent_to_kitchen' => Icons.restaurant_outlined,
+    'preparing' => Icons.soup_kitchen_outlined,
+    'ready' => Icons.done_all,
+    'completed' => Icons.task_alt,
+    'paid' => Icons.paid_outlined,
+    _ => Icons.info_outline,
+  };
+}
+
+String _workflowLabel(String status) {
+  return switch (status) {
+    'sent_to_kitchen' => 'Sent to Kitchen',
+    'preparing' => 'Preparing',
+    'ready' => 'Ready for Pickup',
+    'completed' => 'Completed',
+    'paid' => 'Paid & Closed',
+    _ => status,
+  };
 }

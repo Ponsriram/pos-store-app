@@ -65,7 +65,7 @@ class _OrderCard extends StatelessWidget {
     final progress = _statusProgress(order.status);
     final statusColor = _statusColor(order.status, colorScheme);
     final dateStr = order.createdAt != null
-        ? DateFormat('dd MMM, hh:mm a').format(order.createdAt!)
+        ? DateFormat('dd MMM, hh:mm a').format(order.createdAt!.toLocal())
         : '';
 
     return GestureDetector(

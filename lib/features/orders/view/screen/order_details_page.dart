@@ -34,7 +34,7 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
         ? _order.grandTotal
         : _order.items.fold<double>(0, (s, i) => s + i.total);
     final dateStr = _order.createdAt != null
-        ? DateFormat('dd MMM yyyy, hh:mm a').format(_order.createdAt!)
+        ? DateFormat('dd MMM yyyy, hh:mm a').format(_order.createdAt!.toLocal())
         : '';
 
     return Scaffold(
@@ -178,8 +178,8 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
                   const SizedBox(height: 16),
 
                   // Pay button
-                  if (_order.paymentStatus != 'paid' &&
-                      !_isTerminalState(_order.status))
+                  if (_order.paymentStatus != 'completed' &&
+                      _order.status != 'cancelled')
                     SizedBox(
                       width: double.infinity,
                       child: FilledButton.icon(
@@ -359,7 +359,10 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
                     );
                 if (success && mounted) {
                   setState(() {
-                    _order = _order.copyWith(paymentStatus: 'paid');
+                    _order = _order.copyWith(
+                      paymentStatus: 'completed',
+                      status: 'paid',
+                    );
                   });
                 }
               },
@@ -374,7 +377,7 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
   // ---- Helpers ----
 
   bool _isTerminalState(String status) =>
-      status == 'completed' || status == 'paid' || status == 'cancelled';
+      status == 'paid' || status == 'cancelled';
 
   String? _nextStatus(String status) {
     return switch (status) {
@@ -529,8 +532,8 @@ class _PaymentBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = switch (status) {
-      'unpaid' => Colors.orange,
-      'paid' => Colors.green,
+      'pending' => Colors.orange,
+      'completed' => Colors.green,
       'partial' => Colors.blue,
       'refunded' => Theme.of(context).colorScheme.error,
       _ => Theme.of(context).colorScheme.onSurfaceVariant,

@@ -22,7 +22,7 @@ class OrderCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final statusColor = _statusColor(order.status, colorScheme);
     final dateStr = order.createdAt != null
-        ? DateFormat('dd MMM, hh:mm a').format(order.createdAt!)
+        ? DateFormat('dd MMM, hh:mm a').format(order.createdAt!.toLocal())
         : '';
 
     final total = order.grandTotal > 0

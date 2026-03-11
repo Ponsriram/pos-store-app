@@ -91,6 +91,15 @@ class KotPage extends ConsumerWidget {
                       .read(kotStatusFilterProvider.notifier)
                       .select('READY'),
                 ),
+                const SizedBox(width: 8),
+                _KotFilterChip(
+                  label: 'Served',
+                  value: 'SERVED',
+                  selected: statusFilter,
+                  onSelected: () => ref
+                      .read(kotStatusFilterProvider.notifier)
+                      .select('SERVED'),
+                ),
               ],
             ),
           ),
@@ -408,11 +417,39 @@ class _KotCard extends ConsumerWidget {
                   ),
                 if (ticket.status.toUpperCase() == 'READY')
                   Expanded(
+                    child: FilledButton.icon(
+                      onPressed: ops.isLoading
+                          ? null
+                          : () async {
+                              final success = await ref
+                                  .read(kotOperationsProvider.notifier)
+                                  .updateStatus(ticket.id, 'served');
+                              if (!success && context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Failed to mark served'),
+                                  ),
+                                );
+                              }
+                            },
+                      icon: const Icon(Icons.room_service_outlined, size: 18),
+                      label: const Text('Mark Served'),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: Colors.teal,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ),
+                if (ticket.status.toUpperCase() == 'SERVED')
+                  Expanded(
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: Colors.green.withValues(alpha: 0.1),
+                        color: Colors.grey.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Row(
@@ -421,13 +458,13 @@ class _KotCard extends ConsumerWidget {
                           const Icon(
                             Icons.done_all,
                             size: 18,
-                            color: Colors.green,
+                            color: Colors.grey,
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            'Ready to Serve',
+                            'Served',
                             style: textTheme.labelLarge?.copyWith(
-                              color: Colors.green,
+                              color: Colors.grey,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -448,6 +485,7 @@ class _KotCard extends ConsumerWidget {
       'PENDING' => Colors.orange,
       'PREPARING' => Colors.amber.shade700,
       'READY' => Colors.green,
+      'SERVED' => Colors.grey,
       _ => cs.onSurfaceVariant,
     };
   }
