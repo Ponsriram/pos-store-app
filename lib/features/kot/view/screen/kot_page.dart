@@ -223,8 +223,8 @@ class _KotCard extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        ticket.orderNumber.isNotEmpty
-                            ? '#${ticket.orderNumber}'
+                        ticket.kotNumber > 0
+                            ? 'KOT #${ticket.kotNumber}'
                             : '#${ticket.orderId.substring(0, 8)}',
                         style: textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.bold,
@@ -233,20 +233,22 @@ class _KotCard extends ConsumerWidget {
                       const SizedBox(height: 2),
                       Row(
                         children: [
-                          Icon(
-                            _orderTypeIcon(ticket.orderType),
-                            size: 14,
-                            color: colorScheme.onSurfaceVariant,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            ticket.tableLabel ??
-                                _orderTypeLabel(ticket.orderType),
-                            style: textTheme.bodySmall?.copyWith(
+                          if (ticket.kitchenSection != null &&
+                              ticket.kitchenSection!.isNotEmpty) ...[
+                            Icon(
+                              Icons.kitchen,
+                              size: 14,
                               color: colorScheme.onSurfaceVariant,
                             ),
-                          ),
-                          const SizedBox(width: 8),
+                            const SizedBox(width: 4),
+                            Text(
+                              ticket.kitchenSection!,
+                              style: textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                          ],
                           Text(
                             dateStr,
                             style: textTheme.bodySmall?.copyWith(
@@ -447,24 +449,6 @@ class _KotCard extends ConsumerWidget {
       'PREPARING' => Colors.amber.shade700,
       'READY' => Colors.green,
       _ => cs.onSurfaceVariant,
-    };
-  }
-
-  IconData _orderTypeIcon(String type) {
-    return switch (type) {
-      'dine_in' => Icons.restaurant,
-      'takeaway' || 'take_away' => Icons.takeout_dining,
-      'delivery' => Icons.delivery_dining,
-      _ => Icons.receipt,
-    };
-  }
-
-  String _orderTypeLabel(String type) {
-    return switch (type) {
-      'dine_in' => 'Dine In',
-      'takeaway' || 'take_away' => 'Takeaway',
-      'delivery' => 'Delivery',
-      _ => type,
     };
   }
 }

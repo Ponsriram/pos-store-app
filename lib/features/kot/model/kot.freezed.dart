@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$KitchenOrderTicket {
 
- String get id;@JsonKey(name: 'order_id') String get orderId;@JsonKey(name: 'order_number') String get orderNumber;@JsonKey(name: 'order_type') String get orderType;@JsonKey(name: 'table_label') String? get tableLabel; String get status; List<KotItem> get items;@JsonKey(name: 'created_at') DateTime? get createdAt;@JsonKey(name: 'updated_at') DateTime? get updatedAt;
+ String get id;@JsonKey(name: 'order_id') String get orderId;@JsonKey(name: 'store_id') String get storeId;@JsonKey(name: 'kot_number') int get kotNumber;@JsonKey(name: 'kitchen_section') String? get kitchenSection; String get status;@JsonKey(name: 'reprint_count') int get reprintCount; List<KotItem> get items;@JsonKey(name: 'created_at') DateTime? get createdAt;
 /// Create a copy of KitchenOrderTicket
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $KitchenOrderTicketCopyWith<KitchenOrderTicket> get copyWith => _$KitchenOrderTi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is KitchenOrderTicket&&(identical(other.id, id) || other.id == id)&&(identical(other.orderId, orderId) || other.orderId == orderId)&&(identical(other.orderNumber, orderNumber) || other.orderNumber == orderNumber)&&(identical(other.orderType, orderType) || other.orderType == orderType)&&(identical(other.tableLabel, tableLabel) || other.tableLabel == tableLabel)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other.items, items)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is KitchenOrderTicket&&(identical(other.id, id) || other.id == id)&&(identical(other.orderId, orderId) || other.orderId == orderId)&&(identical(other.storeId, storeId) || other.storeId == storeId)&&(identical(other.kotNumber, kotNumber) || other.kotNumber == kotNumber)&&(identical(other.kitchenSection, kitchenSection) || other.kitchenSection == kitchenSection)&&(identical(other.status, status) || other.status == status)&&(identical(other.reprintCount, reprintCount) || other.reprintCount == reprintCount)&&const DeepCollectionEquality().equals(other.items, items)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,orderId,orderNumber,orderType,tableLabel,status,const DeepCollectionEquality().hash(items),createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,orderId,storeId,kotNumber,kitchenSection,status,reprintCount,const DeepCollectionEquality().hash(items),createdAt);
 
 @override
 String toString() {
-  return 'KitchenOrderTicket(id: $id, orderId: $orderId, orderNumber: $orderNumber, orderType: $orderType, tableLabel: $tableLabel, status: $status, items: $items, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'KitchenOrderTicket(id: $id, orderId: $orderId, storeId: $storeId, kotNumber: $kotNumber, kitchenSection: $kitchenSection, status: $status, reprintCount: $reprintCount, items: $items, createdAt: $createdAt)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $KitchenOrderTicketCopyWith<$Res>  {
   factory $KitchenOrderTicketCopyWith(KitchenOrderTicket value, $Res Function(KitchenOrderTicket) _then) = _$KitchenOrderTicketCopyWithImpl;
 @useResult
 $Res call({
- String id,@JsonKey(name: 'order_id') String orderId,@JsonKey(name: 'order_number') String orderNumber,@JsonKey(name: 'order_type') String orderType,@JsonKey(name: 'table_label') String? tableLabel, String status, List<KotItem> items,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
+ String id,@JsonKey(name: 'order_id') String orderId,@JsonKey(name: 'store_id') String storeId,@JsonKey(name: 'kot_number') int kotNumber,@JsonKey(name: 'kitchen_section') String? kitchenSection, String status,@JsonKey(name: 'reprint_count') int reprintCount, List<KotItem> items,@JsonKey(name: 'created_at') DateTime? createdAt
 });
 
 
@@ -65,17 +65,17 @@ class _$KitchenOrderTicketCopyWithImpl<$Res>
 
 /// Create a copy of KitchenOrderTicket
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? orderId = null,Object? orderNumber = null,Object? orderType = null,Object? tableLabel = freezed,Object? status = null,Object? items = null,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? orderId = null,Object? storeId = null,Object? kotNumber = null,Object? kitchenSection = freezed,Object? status = null,Object? reprintCount = null,Object? items = null,Object? createdAt = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,orderId: null == orderId ? _self.orderId : orderId // ignore: cast_nullable_to_non_nullable
-as String,orderNumber: null == orderNumber ? _self.orderNumber : orderNumber // ignore: cast_nullable_to_non_nullable
-as String,orderType: null == orderType ? _self.orderType : orderType // ignore: cast_nullable_to_non_nullable
-as String,tableLabel: freezed == tableLabel ? _self.tableLabel : tableLabel // ignore: cast_nullable_to_non_nullable
+as String,storeId: null == storeId ? _self.storeId : storeId // ignore: cast_nullable_to_non_nullable
+as String,kotNumber: null == kotNumber ? _self.kotNumber : kotNumber // ignore: cast_nullable_to_non_nullable
+as int,kitchenSection: freezed == kitchenSection ? _self.kitchenSection : kitchenSection // ignore: cast_nullable_to_non_nullable
 as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String,items: null == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
+as String,reprintCount: null == reprintCount ? _self.reprintCount : reprintCount // ignore: cast_nullable_to_non_nullable
+as int,items: null == items ? _self.items : items // ignore: cast_nullable_to_non_nullable
 as List<KotItem>,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,
   ));
 }
@@ -161,10 +161,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'order_id')  String orderId, @JsonKey(name: 'order_number')  String orderNumber, @JsonKey(name: 'order_type')  String orderType, @JsonKey(name: 'table_label')  String? tableLabel,  String status,  List<KotItem> items, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'order_id')  String orderId, @JsonKey(name: 'store_id')  String storeId, @JsonKey(name: 'kot_number')  int kotNumber, @JsonKey(name: 'kitchen_section')  String? kitchenSection,  String status, @JsonKey(name: 'reprint_count')  int reprintCount,  List<KotItem> items, @JsonKey(name: 'created_at')  DateTime? createdAt)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _KitchenOrderTicket() when $default != null:
-return $default(_that.id,_that.orderId,_that.orderNumber,_that.orderType,_that.tableLabel,_that.status,_that.items,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.orderId,_that.storeId,_that.kotNumber,_that.kitchenSection,_that.status,_that.reprintCount,_that.items,_that.createdAt);case _:
   return orElse();
 
 }
@@ -182,10 +182,10 @@ return $default(_that.id,_that.orderId,_that.orderNumber,_that.orderType,_that.t
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'order_id')  String orderId, @JsonKey(name: 'order_number')  String orderNumber, @JsonKey(name: 'order_type')  String orderType, @JsonKey(name: 'table_label')  String? tableLabel,  String status,  List<KotItem> items, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'order_id')  String orderId, @JsonKey(name: 'store_id')  String storeId, @JsonKey(name: 'kot_number')  int kotNumber, @JsonKey(name: 'kitchen_section')  String? kitchenSection,  String status, @JsonKey(name: 'reprint_count')  int reprintCount,  List<KotItem> items, @JsonKey(name: 'created_at')  DateTime? createdAt)  $default,) {final _that = this;
 switch (_that) {
 case _KitchenOrderTicket():
-return $default(_that.id,_that.orderId,_that.orderNumber,_that.orderType,_that.tableLabel,_that.status,_that.items,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.orderId,_that.storeId,_that.kotNumber,_that.kitchenSection,_that.status,_that.reprintCount,_that.items,_that.createdAt);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -202,10 +202,10 @@ return $default(_that.id,_that.orderId,_that.orderNumber,_that.orderType,_that.t
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'order_id')  String orderId, @JsonKey(name: 'order_number')  String orderNumber, @JsonKey(name: 'order_type')  String orderType, @JsonKey(name: 'table_label')  String? tableLabel,  String status,  List<KotItem> items, @JsonKey(name: 'created_at')  DateTime? createdAt, @JsonKey(name: 'updated_at')  DateTime? updatedAt)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'order_id')  String orderId, @JsonKey(name: 'store_id')  String storeId, @JsonKey(name: 'kot_number')  int kotNumber, @JsonKey(name: 'kitchen_section')  String? kitchenSection,  String status, @JsonKey(name: 'reprint_count')  int reprintCount,  List<KotItem> items, @JsonKey(name: 'created_at')  DateTime? createdAt)?  $default,) {final _that = this;
 switch (_that) {
 case _KitchenOrderTicket() when $default != null:
-return $default(_that.id,_that.orderId,_that.orderNumber,_that.orderType,_that.tableLabel,_that.status,_that.items,_that.createdAt,_that.updatedAt);case _:
+return $default(_that.id,_that.orderId,_that.storeId,_that.kotNumber,_that.kitchenSection,_that.status,_that.reprintCount,_that.items,_that.createdAt);case _:
   return null;
 
 }
@@ -217,15 +217,16 @@ return $default(_that.id,_that.orderId,_that.orderNumber,_that.orderType,_that.t
 @JsonSerializable()
 
 class _KitchenOrderTicket implements KitchenOrderTicket {
-  const _KitchenOrderTicket({required this.id, @JsonKey(name: 'order_id') required this.orderId, @JsonKey(name: 'order_number') this.orderNumber = '', @JsonKey(name: 'order_type') this.orderType = 'dine_in', @JsonKey(name: 'table_label') this.tableLabel, this.status = 'PENDING', final  List<KotItem> items = const [], @JsonKey(name: 'created_at') this.createdAt, @JsonKey(name: 'updated_at') this.updatedAt}): _items = items;
+  const _KitchenOrderTicket({required this.id, @JsonKey(name: 'order_id') required this.orderId, @JsonKey(name: 'store_id') required this.storeId, @JsonKey(name: 'kot_number') this.kotNumber = 0, @JsonKey(name: 'kitchen_section') this.kitchenSection, this.status = 'pending', @JsonKey(name: 'reprint_count') this.reprintCount = 0, final  List<KotItem> items = const [], @JsonKey(name: 'created_at') this.createdAt}): _items = items;
   factory _KitchenOrderTicket.fromJson(Map<String, dynamic> json) => _$KitchenOrderTicketFromJson(json);
 
 @override final  String id;
 @override@JsonKey(name: 'order_id') final  String orderId;
-@override@JsonKey(name: 'order_number') final  String orderNumber;
-@override@JsonKey(name: 'order_type') final  String orderType;
-@override@JsonKey(name: 'table_label') final  String? tableLabel;
+@override@JsonKey(name: 'store_id') final  String storeId;
+@override@JsonKey(name: 'kot_number') final  int kotNumber;
+@override@JsonKey(name: 'kitchen_section') final  String? kitchenSection;
 @override@JsonKey() final  String status;
+@override@JsonKey(name: 'reprint_count') final  int reprintCount;
  final  List<KotItem> _items;
 @override@JsonKey() List<KotItem> get items {
   if (_items is EqualUnmodifiableListView) return _items;
@@ -234,7 +235,6 @@ class _KitchenOrderTicket implements KitchenOrderTicket {
 }
 
 @override@JsonKey(name: 'created_at') final  DateTime? createdAt;
-@override@JsonKey(name: 'updated_at') final  DateTime? updatedAt;
 
 /// Create a copy of KitchenOrderTicket
 /// with the given fields replaced by the non-null parameter values.
@@ -249,16 +249,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _KitchenOrderTicket&&(identical(other.id, id) || other.id == id)&&(identical(other.orderId, orderId) || other.orderId == orderId)&&(identical(other.orderNumber, orderNumber) || other.orderNumber == orderNumber)&&(identical(other.orderType, orderType) || other.orderType == orderType)&&(identical(other.tableLabel, tableLabel) || other.tableLabel == tableLabel)&&(identical(other.status, status) || other.status == status)&&const DeepCollectionEquality().equals(other._items, _items)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt)&&(identical(other.updatedAt, updatedAt) || other.updatedAt == updatedAt));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _KitchenOrderTicket&&(identical(other.id, id) || other.id == id)&&(identical(other.orderId, orderId) || other.orderId == orderId)&&(identical(other.storeId, storeId) || other.storeId == storeId)&&(identical(other.kotNumber, kotNumber) || other.kotNumber == kotNumber)&&(identical(other.kitchenSection, kitchenSection) || other.kitchenSection == kitchenSection)&&(identical(other.status, status) || other.status == status)&&(identical(other.reprintCount, reprintCount) || other.reprintCount == reprintCount)&&const DeepCollectionEquality().equals(other._items, _items)&&(identical(other.createdAt, createdAt) || other.createdAt == createdAt));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,orderId,orderNumber,orderType,tableLabel,status,const DeepCollectionEquality().hash(_items),createdAt,updatedAt);
+int get hashCode => Object.hash(runtimeType,id,orderId,storeId,kotNumber,kitchenSection,status,reprintCount,const DeepCollectionEquality().hash(_items),createdAt);
 
 @override
 String toString() {
-  return 'KitchenOrderTicket(id: $id, orderId: $orderId, orderNumber: $orderNumber, orderType: $orderType, tableLabel: $tableLabel, status: $status, items: $items, createdAt: $createdAt, updatedAt: $updatedAt)';
+  return 'KitchenOrderTicket(id: $id, orderId: $orderId, storeId: $storeId, kotNumber: $kotNumber, kitchenSection: $kitchenSection, status: $status, reprintCount: $reprintCount, items: $items, createdAt: $createdAt)';
 }
 
 
@@ -269,7 +269,7 @@ abstract mixin class _$KitchenOrderTicketCopyWith<$Res> implements $KitchenOrder
   factory _$KitchenOrderTicketCopyWith(_KitchenOrderTicket value, $Res Function(_KitchenOrderTicket) _then) = __$KitchenOrderTicketCopyWithImpl;
 @override @useResult
 $Res call({
- String id,@JsonKey(name: 'order_id') String orderId,@JsonKey(name: 'order_number') String orderNumber,@JsonKey(name: 'order_type') String orderType,@JsonKey(name: 'table_label') String? tableLabel, String status, List<KotItem> items,@JsonKey(name: 'created_at') DateTime? createdAt,@JsonKey(name: 'updated_at') DateTime? updatedAt
+ String id,@JsonKey(name: 'order_id') String orderId,@JsonKey(name: 'store_id') String storeId,@JsonKey(name: 'kot_number') int kotNumber,@JsonKey(name: 'kitchen_section') String? kitchenSection, String status,@JsonKey(name: 'reprint_count') int reprintCount, List<KotItem> items,@JsonKey(name: 'created_at') DateTime? createdAt
 });
 
 
@@ -286,17 +286,17 @@ class __$KitchenOrderTicketCopyWithImpl<$Res>
 
 /// Create a copy of KitchenOrderTicket
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? orderId = null,Object? orderNumber = null,Object? orderType = null,Object? tableLabel = freezed,Object? status = null,Object? items = null,Object? createdAt = freezed,Object? updatedAt = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? orderId = null,Object? storeId = null,Object? kotNumber = null,Object? kitchenSection = freezed,Object? status = null,Object? reprintCount = null,Object? items = null,Object? createdAt = freezed,}) {
   return _then(_KitchenOrderTicket(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,orderId: null == orderId ? _self.orderId : orderId // ignore: cast_nullable_to_non_nullable
-as String,orderNumber: null == orderNumber ? _self.orderNumber : orderNumber // ignore: cast_nullable_to_non_nullable
-as String,orderType: null == orderType ? _self.orderType : orderType // ignore: cast_nullable_to_non_nullable
-as String,tableLabel: freezed == tableLabel ? _self.tableLabel : tableLabel // ignore: cast_nullable_to_non_nullable
+as String,storeId: null == storeId ? _self.storeId : storeId // ignore: cast_nullable_to_non_nullable
+as String,kotNumber: null == kotNumber ? _self.kotNumber : kotNumber // ignore: cast_nullable_to_non_nullable
+as int,kitchenSection: freezed == kitchenSection ? _self.kitchenSection : kitchenSection // ignore: cast_nullable_to_non_nullable
 as String?,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
-as String,items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
+as String,reprintCount: null == reprintCount ? _self.reprintCount : reprintCount // ignore: cast_nullable_to_non_nullable
+as int,items: null == items ? _self._items : items // ignore: cast_nullable_to_non_nullable
 as List<KotItem>,createdAt: freezed == createdAt ? _self.createdAt : createdAt // ignore: cast_nullable_to_non_nullable
-as DateTime?,updatedAt: freezed == updatedAt ? _self.updatedAt : updatedAt // ignore: cast_nullable_to_non_nullable
 as DateTime?,
   ));
 }
@@ -308,7 +308,7 @@ as DateTime?,
 /// @nodoc
 mixin _$KotItem {
 
- String get id;@JsonKey(name: 'product_name') String get productName; int get quantity; String? get notes;
+ String get id;@JsonKey(name: 'kot_id') String get kotId;@JsonKey(name: 'order_item_id') String get orderItemId;@JsonKey(name: 'product_name') String get productName; int get quantity; String? get notes;
 /// Create a copy of KotItem
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -321,16 +321,16 @@ $KotItemCopyWith<KotItem> get copyWith => _$KotItemCopyWithImpl<KotItem>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is KotItem&&(identical(other.id, id) || other.id == id)&&(identical(other.productName, productName) || other.productName == productName)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.notes, notes) || other.notes == notes));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is KotItem&&(identical(other.id, id) || other.id == id)&&(identical(other.kotId, kotId) || other.kotId == kotId)&&(identical(other.orderItemId, orderItemId) || other.orderItemId == orderItemId)&&(identical(other.productName, productName) || other.productName == productName)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.notes, notes) || other.notes == notes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,productName,quantity,notes);
+int get hashCode => Object.hash(runtimeType,id,kotId,orderItemId,productName,quantity,notes);
 
 @override
 String toString() {
-  return 'KotItem(id: $id, productName: $productName, quantity: $quantity, notes: $notes)';
+  return 'KotItem(id: $id, kotId: $kotId, orderItemId: $orderItemId, productName: $productName, quantity: $quantity, notes: $notes)';
 }
 
 
@@ -341,7 +341,7 @@ abstract mixin class $KotItemCopyWith<$Res>  {
   factory $KotItemCopyWith(KotItem value, $Res Function(KotItem) _then) = _$KotItemCopyWithImpl;
 @useResult
 $Res call({
- String id,@JsonKey(name: 'product_name') String productName, int quantity, String? notes
+ String id,@JsonKey(name: 'kot_id') String kotId,@JsonKey(name: 'order_item_id') String orderItemId,@JsonKey(name: 'product_name') String productName, int quantity, String? notes
 });
 
 
@@ -358,9 +358,11 @@ class _$KotItemCopyWithImpl<$Res>
 
 /// Create a copy of KotItem
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? productName = null,Object? quantity = null,Object? notes = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? kotId = null,Object? orderItemId = null,Object? productName = null,Object? quantity = null,Object? notes = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,kotId: null == kotId ? _self.kotId : kotId // ignore: cast_nullable_to_non_nullable
+as String,orderItemId: null == orderItemId ? _self.orderItemId : orderItemId // ignore: cast_nullable_to_non_nullable
 as String,productName: null == productName ? _self.productName : productName // ignore: cast_nullable_to_non_nullable
 as String,quantity: null == quantity ? _self.quantity : quantity // ignore: cast_nullable_to_non_nullable
 as int,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable
@@ -449,10 +451,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'product_name')  String productName,  int quantity,  String? notes)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'kot_id')  String kotId, @JsonKey(name: 'order_item_id')  String orderItemId, @JsonKey(name: 'product_name')  String productName,  int quantity,  String? notes)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _KotItem() when $default != null:
-return $default(_that.id,_that.productName,_that.quantity,_that.notes);case _:
+return $default(_that.id,_that.kotId,_that.orderItemId,_that.productName,_that.quantity,_that.notes);case _:
   return orElse();
 
 }
@@ -470,10 +472,10 @@ return $default(_that.id,_that.productName,_that.quantity,_that.notes);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'product_name')  String productName,  int quantity,  String? notes)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id, @JsonKey(name: 'kot_id')  String kotId, @JsonKey(name: 'order_item_id')  String orderItemId, @JsonKey(name: 'product_name')  String productName,  int quantity,  String? notes)  $default,) {final _that = this;
 switch (_that) {
 case _KotItem():
-return $default(_that.id,_that.productName,_that.quantity,_that.notes);case _:
+return $default(_that.id,_that.kotId,_that.orderItemId,_that.productName,_that.quantity,_that.notes);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -490,10 +492,10 @@ return $default(_that.id,_that.productName,_that.quantity,_that.notes);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'product_name')  String productName,  int quantity,  String? notes)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id, @JsonKey(name: 'kot_id')  String kotId, @JsonKey(name: 'order_item_id')  String orderItemId, @JsonKey(name: 'product_name')  String productName,  int quantity,  String? notes)?  $default,) {final _that = this;
 switch (_that) {
 case _KotItem() when $default != null:
-return $default(_that.id,_that.productName,_that.quantity,_that.notes);case _:
+return $default(_that.id,_that.kotId,_that.orderItemId,_that.productName,_that.quantity,_that.notes);case _:
   return null;
 
 }
@@ -505,10 +507,12 @@ return $default(_that.id,_that.productName,_that.quantity,_that.notes);case _:
 @JsonSerializable()
 
 class _KotItem implements KotItem {
-  const _KotItem({required this.id, @JsonKey(name: 'product_name') required this.productName, this.quantity = 1, this.notes});
+  const _KotItem({required this.id, @JsonKey(name: 'kot_id') required this.kotId, @JsonKey(name: 'order_item_id') required this.orderItemId, @JsonKey(name: 'product_name') required this.productName, this.quantity = 1, this.notes});
   factory _KotItem.fromJson(Map<String, dynamic> json) => _$KotItemFromJson(json);
 
 @override final  String id;
+@override@JsonKey(name: 'kot_id') final  String kotId;
+@override@JsonKey(name: 'order_item_id') final  String orderItemId;
 @override@JsonKey(name: 'product_name') final  String productName;
 @override@JsonKey() final  int quantity;
 @override final  String? notes;
@@ -526,16 +530,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _KotItem&&(identical(other.id, id) || other.id == id)&&(identical(other.productName, productName) || other.productName == productName)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.notes, notes) || other.notes == notes));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _KotItem&&(identical(other.id, id) || other.id == id)&&(identical(other.kotId, kotId) || other.kotId == kotId)&&(identical(other.orderItemId, orderItemId) || other.orderItemId == orderItemId)&&(identical(other.productName, productName) || other.productName == productName)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.notes, notes) || other.notes == notes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,productName,quantity,notes);
+int get hashCode => Object.hash(runtimeType,id,kotId,orderItemId,productName,quantity,notes);
 
 @override
 String toString() {
-  return 'KotItem(id: $id, productName: $productName, quantity: $quantity, notes: $notes)';
+  return 'KotItem(id: $id, kotId: $kotId, orderItemId: $orderItemId, productName: $productName, quantity: $quantity, notes: $notes)';
 }
 
 
@@ -546,7 +550,7 @@ abstract mixin class _$KotItemCopyWith<$Res> implements $KotItemCopyWith<$Res> {
   factory _$KotItemCopyWith(_KotItem value, $Res Function(_KotItem) _then) = __$KotItemCopyWithImpl;
 @override @useResult
 $Res call({
- String id,@JsonKey(name: 'product_name') String productName, int quantity, String? notes
+ String id,@JsonKey(name: 'kot_id') String kotId,@JsonKey(name: 'order_item_id') String orderItemId,@JsonKey(name: 'product_name') String productName, int quantity, String? notes
 });
 
 
@@ -563,9 +567,11 @@ class __$KotItemCopyWithImpl<$Res>
 
 /// Create a copy of KotItem
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? productName = null,Object? quantity = null,Object? notes = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? kotId = null,Object? orderItemId = null,Object? productName = null,Object? quantity = null,Object? notes = freezed,}) {
   return _then(_KotItem(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,kotId: null == kotId ? _self.kotId : kotId // ignore: cast_nullable_to_non_nullable
+as String,orderItemId: null == orderItemId ? _self.orderItemId : orderItemId // ignore: cast_nullable_to_non_nullable
 as String,productName: null == productName ? _self.productName : productName // ignore: cast_nullable_to_non_nullable
 as String,quantity: null == quantity ? _self.quantity : quantity // ignore: cast_nullable_to_non_nullable
 as int,notes: freezed == notes ? _self.notes : notes // ignore: cast_nullable_to_non_nullable

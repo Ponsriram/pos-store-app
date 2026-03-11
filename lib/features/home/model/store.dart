@@ -1,7 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-import 'table.dart';
-
 part 'store.freezed.dart';
 part 'store.g.dart';
 
@@ -11,17 +9,19 @@ abstract class Store with _$Store {
     required String id,
     @JsonKey(name: 'owner_id') required String ownerId,
     required String name,
-    @JsonKey(name: 'location') @Default('') String? address,
-    @Default('') String? city,
-    @Default('') String? phone,
-    @Default('') String? email,
-    @JsonKey(name: 'gst_number') String? gstNumber,
+    @JsonKey(name: 'location') String? address,
+    String? city,
+    String? state,
+    String? phone,
+    String? email,
+    @JsonKey(name: 'outlet_type') String? outletType,
     @Default('INR') String currency,
     @Default('Asia/Kolkata') String timezone,
-    @JsonKey(name: 'table_count') @Default(0) int numTables,
+    @JsonKey(name: 'tax_inclusive') @Default(false) bool taxInclusive,
+    @JsonKey(name: 'chain_id') String? chainId,
+    @JsonKey(name: 'table_count') @Default(0) int tableCount,
     @JsonKey(name: 'is_active') @Default(true) bool isActive,
     @JsonKey(name: 'created_at') DateTime? createdAt,
-    @Default([]) List<DineInTable> tables,
   }) = _Store;
 
   factory Store.fromJson(Map<String, dynamic> json) => _$StoreFromJson(json);

@@ -8,6 +8,7 @@ import '../model/table.dart';
 import '../repository/category_repository.dart';
 import '../repository/order_repository.dart';
 import '../repository/product_repository.dart';
+import '../repository/store_repository.dart';
 import 'store_viewmodel.dart';
 
 part 'home_viewmodel.g.dart';
@@ -60,6 +61,29 @@ class ProductList extends _$ProductList {
       (products) => products,
     );
   }
+}
+
+/// All products for the current store (no category filter) — used for name lookups.
+@riverpod
+class AllProducts extends _$AllProducts {
+  @override
+  Future<List<Product>> build() async {
+    final store = ref.watch(selectedStoreProvider);
+    if (store == null) return [];
+    final repo = ref.read(productRepositoryProvider);
+    final result = await repo.getProducts(storeId: store.id);
+    return result.fold(
+      (failure) => throw Exception(failure.message),
+      (products) => products,
+    );
+  }
+}
+
+/// Maps product ID → Product for fast lookups.
+@riverpod
+Future<Map<String, Product>> productMap(Ref ref) async {
+  final products = await ref.watch(allProductsProvider.future);
+  return {for (final p in products) p.id: p};
 }
 
 // ---------------------------------------------------------------------------
@@ -190,6 +214,25 @@ class SelectedTable extends _$SelectedTable {
 }
 
 // ---------------------------------------------------------------------------
+// Store tables (fetched from API)
+// ---------------------------------------------------------------------------
+
+@riverpod
+class StoreTables extends _$StoreTables {
+  @override
+  Future<List<DineInTable>> build() async {
+    final store = ref.watch(selectedStoreProvider);
+    if (store == null) return [];
+    final repo = ref.read(storeRepositoryProvider);
+    final result = await repo.getStoreTables(storeId: store.id);
+    return result.fold(
+      (failure) => throw Exception(failure.message),
+      (tables) => tables,
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
 // Payment method
 // ---------------------------------------------------------------------------
 
@@ -232,7 +275,7 @@ class OrderOperations extends _$OrderOperations {
     final orderCreate = OrderCreate(
       storeId: store.id,
       orderType: orderType,
-      tableId: orderType == 'dine_in' ? table?.id : null,
+      tableNumber: orderType == 'dine_in' ? table?.tableNumber : null,
       items: cartItems
           .map(
             (e) => OrderItemCreate(
@@ -274,6 +317,8 @@ class OrderOperations extends _$OrderOperations {
     state = const AsyncLoading();
 
     final repo = ref.read(orderRepositoryProvider);
+
+    // 1. Generate KOT
     final result = await repo.sendToKitchen(orderId);
 
     return result.fold(
@@ -282,14 +327,25 @@ class OrderOperations extends _$OrderOperations {
         return false;
       },
       (_) {
+        // Refresh orders and re-fetch current order
         ref.invalidate(activeOrdersProvider);
+        _refreshCurrentOrder(orderId);
         state = const AsyncData(null);
         return true;
       },
     );
   }
 
-  /// Complete payment (dummy billing) – marks order as COMPLETED.
+  Future<void> _refreshCurrentOrder(String orderId) async {
+    final repo = ref.read(orderRepositoryProvider);
+    final result = await repo.getOrderById(orderId);
+    result.fold(
+      (_) {},
+      (order) => ref.read(currentOrderProvider.notifier).set(order),
+    );
+  }
+
+  /// Complete payment – records payment and marks order as paid/completed.
   Future<bool> completePayment() async {
     final orderId = ref.read(currentOrderIdProvider);
     if (orderId == null) {
@@ -301,16 +357,30 @@ class OrderOperations extends _$OrderOperations {
 
     final paymentMethod = ref.read(selectedPaymentMethodProvider);
     final currentOrder = ref.read(currentOrderProvider);
-    final grandTotal = currentOrder?.grandTotal ?? 0;
+
+    // Use grandTotal from the order (mapped from net_amount), or compute from cart
+    double amount = currentOrder?.grandTotal ?? 0;
+    if (amount == 0) {
+      final cartItems = ref.read(cartProvider);
+      amount = cartItems.fold<double>(
+        0,
+        (s, e) => s + e.product.price * e.quantity,
+      );
+      amount += cartItems.fold<double>(
+        0,
+        (s, e) =>
+            s + (e.product.price * e.quantity * e.product.taxPercent / 100),
+      );
+    }
 
     final repo = ref.read(orderRepositoryProvider);
 
-    // 1. Create payment
+    // Record payment – the backend auto-updates payment_status when fully paid.
     final payResult = await repo.createPayment(
       PaymentCreate(
         orderId: orderId,
         paymentMethod: paymentMethod,
-        amount: grandTotal,
+        amount: amount,
       ),
     );
 
@@ -323,27 +393,13 @@ class OrderOperations extends _$OrderOperations {
       return false;
     }
 
-    // 2. Update status to COMPLETED
-    final statusResult = await repo.updateOrderStatus(
-      orderId: orderId,
-      status: 'completed',
-    );
-
-    return statusResult.fold(
-      (failure) {
-        state = AsyncError(failure.message, StackTrace.current);
-        return false;
-      },
-      (_) {
-        // Clear local state
-        ref.read(cartProvider.notifier).clear();
-        ref.read(currentOrderIdProvider.notifier).set(null);
-        ref.read(currentOrderProvider.notifier).set(null);
-        ref.invalidate(activeOrdersProvider);
-        state = const AsyncData(null);
-        return true;
-      },
-    );
+    // Clear local state and refresh orders list
+    ref.read(cartProvider.notifier).clear();
+    ref.read(currentOrderIdProvider.notifier).set(null);
+    ref.read(currentOrderProvider.notifier).set(null);
+    ref.invalidate(activeOrdersProvider);
+    state = const AsyncData(null);
+    return true;
   }
 
   /// Load an existing order into the cart for editing.
@@ -354,15 +410,24 @@ class OrderOperations extends _$OrderOperations {
     ref.read(currentOrderProvider.notifier).set(order);
     ref.read(selectedOrderTypeProvider.notifier).select(order.orderType);
 
-    // Convert order items to cart items (use a placeholder Product).
+    // Try to resolve product names from the all-products cache.
+    Map<String, Product> productMap = {};
+    try {
+      productMap = await ref.read(productMapProvider.future);
+    } catch (_) {}
+
+    // Convert order items to cart items.
     final cartItems = order.items.map((item) {
-      final product = Product(
-        id: item.productId,
-        storeId: order.storeId,
-        categoryId: '',
-        name: item.productName,
-        price: item.price,
-      );
+      final cached = productMap[item.productId];
+      final product =
+          cached ??
+          Product(
+            id: item.productId,
+            storeId: order.storeId,
+            categoryId: null,
+            name: item.productName.isNotEmpty ? item.productName : 'Product',
+            price: item.price,
+          );
       return CartItem(
         product: product,
         quantity: item.quantity,

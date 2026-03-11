@@ -97,7 +97,7 @@ class OrderCard extends StatelessWidget {
                     color: colorScheme.onSurfaceVariant,
                   ),
                 ),
-                if (order.tableId != null) ...[
+                if (order.tableNumber != null) ...[
                   const SizedBox(width: 8),
                   Icon(
                     Icons.table_restaurant_outlined,

@@ -129,7 +129,7 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
                       style: textTheme.bodyMedium,
                     ),
                   ),
-                  if (_order.tableId != null) ...[
+                  if (_order.tableNumber != null) ...[
                     const SizedBox(height: 12),
                     _InfoRow(
                       label: 'Table',

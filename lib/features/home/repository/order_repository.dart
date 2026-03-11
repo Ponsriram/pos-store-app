@@ -113,7 +113,7 @@ class OrderRepository {
       }
 
       final uri = _buildUri(ApiEndpoints.orderStatus(orderId));
-      final response = await client.patch(
+      final response = await client.put(
         uri,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'status': status}),
@@ -198,7 +198,7 @@ class OrderRepository {
         return const Left(Failure('No internet connection.'));
       }
 
-      final uri = _buildUri(ApiEndpoints.orderPayments(payment.orderId));
+      final uri = _buildUri(ApiEndpoints.orderPayments);
       final response = await client.post(
         uri,
         headers: {'Content-Type': 'application/json'},
