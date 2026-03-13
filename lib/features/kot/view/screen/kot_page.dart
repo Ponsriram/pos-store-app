@@ -93,12 +93,12 @@ class KotPage extends ConsumerWidget {
                 ),
                 const SizedBox(width: 8),
                 _KotFilterChip(
-                  label: 'Served',
-                  value: 'SERVED',
+                  label: 'Completed',
+                  value: 'COMPLETED',
                   selected: statusFilter,
                   onSelected: () => ref
                       .read(kotStatusFilterProvider.notifier)
-                      .select('SERVED'),
+                      .select('COMPLETED'),
                 ),
               ],
             ),
@@ -129,11 +129,7 @@ class KotPage extends ConsumerWidget {
               final filtered = statusFilter == null
                   ? tickets
                   : tickets
-                        .where(
-                          (t) =>
-                              t.status.toUpperCase() ==
-                              statusFilter.toUpperCase(),
-                        )
+                        .where((t) => _ticketFilterStatus(t) == statusFilter)
                         .toList();
 
               if (filtered.isEmpty) {
@@ -281,7 +277,7 @@ class _KotCard extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    ticket.status.toUpperCase(),
+                    _displayStatusLabel(ticket.status),
                     style: textTheme.labelSmall?.copyWith(
                       color: statusColor,
                       fontWeight: FontWeight.w700,
@@ -427,13 +423,13 @@ class _KotCard extends ConsumerWidget {
                               if (!success && context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text('Failed to mark served'),
+                                    content: Text('Failed to mark completed'),
                                   ),
                                 );
                               }
                             },
-                      icon: const Icon(Icons.room_service_outlined, size: 18),
-                      label: const Text('Mark Served'),
+                      icon: const Icon(Icons.task_alt, size: 18),
+                      label: const Text('Mark Completed'),
                       style: FilledButton.styleFrom(
                         backgroundColor: Colors.teal,
                         foregroundColor: Colors.white,
@@ -462,7 +458,7 @@ class _KotCard extends ConsumerWidget {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            'Served',
+                            'Completed',
                             style: textTheme.labelLarge?.copyWith(
                               color: Colors.grey,
                               fontWeight: FontWeight.w600,
@@ -489,6 +485,17 @@ class _KotCard extends ConsumerWidget {
       _ => cs.onSurfaceVariant,
     };
   }
+
+  String _displayStatusLabel(String rawStatus) {
+    final s = rawStatus.toUpperCase();
+    if (s == 'SERVED') return 'COMPLETED';
+    return s;
+  }
+}
+
+String _ticketFilterStatus(KitchenOrderTicket ticket) {
+  final s = ticket.status.toUpperCase();
+  return s == 'SERVED' ? 'COMPLETED' : s;
 }
 
 // ---------------------------------------------------------------------------

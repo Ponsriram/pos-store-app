@@ -199,7 +199,7 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
 
                   // Pay button
                   if (_order.paymentStatus != 'completed' &&
-                      _isPaymentUnlocked(_order))
+                      _order.status != 'cancelled')
                     SizedBox(
                       width: double.infinity,
                       child: FilledButton.icon(
@@ -207,7 +207,11 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
                             ? null
                             : () => _showPaymentDialog(total),
                         icon: const Icon(Icons.payment),
-                        label: const Text('Process Payment'),
+                        label: Text(
+                          _isPaymentUnlocked(_order)
+                              ? 'Process Payment'
+                              : 'Take Advance Payment',
+                        ),
                       ),
                     )
                   else if (_order.paymentStatus != 'completed')
@@ -299,6 +303,9 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
 
   void _showPaymentDialog(double total) {
     String method = 'cash';
+    final amountController = TextEditingController(
+      text: total.toStringAsFixed(2),
+    );
     showDialog(
       context: context,
       builder: (ctx) => StatefulBuilder(
@@ -308,12 +315,24 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Total: \u20B9${total.toStringAsFixed(2)}',
+                'Order Total: \u20B9${total.toStringAsFixed(2)}',
                 style: Theme.of(ctx).textTheme.headlineSmall?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 16),
+              TextField(
+                controller: amountController,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(
+                  labelText: 'Amount',
+                  border: OutlineInputBorder(),
+                  prefixText: '\u20B9 ',
+                ),
+              ),
+              const SizedBox(height: 12),
               SegmentedButton<String>(
                 segments: const [
                   ButtonSegment(value: 'cash', label: Text('Cash')),
@@ -334,13 +353,23 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
             ),
             FilledButton(
               onPressed: () async {
+                final amount = double.tryParse(amountController.text.trim());
+                if (amount == null || amount <= 0) {
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Enter a valid payment amount'),
+                    ),
+                  );
+                  return;
+                }
                 Navigator.pop(ctx);
                 final success = await ref
                     .read(ordersPageOperationsProvider.notifier)
                     .processPayment(
                       orderId: _order.id,
                       paymentMethod: method,
-                      amount: total,
+                      amount: amount,
                     );
                 if (success && mounted) {
                   final latest = await ref

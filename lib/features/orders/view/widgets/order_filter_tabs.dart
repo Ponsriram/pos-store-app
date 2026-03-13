@@ -10,14 +10,8 @@ class OrderFilterTabs extends ConsumerWidget {
   static const _statusFilters = <String?, String>{
     null: 'All',
     'open': 'Open',
-    'sent_to_kitchen': 'In Kitchen',
-    'preparing': 'Preparing',
+    'in_kitchen': 'In Kitchen',
     'ready': 'Ready',
-    'served': 'Served',
-    'handed_over': 'Given to Customer',
-    'out_for_delivery': 'Out for Delivery',
-    'delivered': 'Delivered',
-    'completed': 'Completed',
     'paid': 'Paid',
     'cancelled': 'Cancelled',
   };

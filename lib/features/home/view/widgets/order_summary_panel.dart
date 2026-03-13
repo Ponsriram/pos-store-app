@@ -336,13 +336,10 @@ class OrderSummaryPanel extends ConsumerWidget {
                     const SizedBox(height: 8),
                   ],
 
-                  // Complete Payment — only after fulfillment is completed
+                  // Payment action — can be taken before or after kitchen flow
                   if ((currentOrder?.paymentStatus ?? 'pending') !=
                           'completed' &&
-                      _isPaymentUnlocked(
-                        currentOrder?.status,
-                        currentOrder?.orderType,
-                      )) ...[
+                      (currentOrder?.status ?? 'open') != 'cancelled') ...[
                     SizedBox(
                       width: double.infinity,
                       height: 44,
@@ -380,7 +377,14 @@ class OrderSummaryPanel extends ConsumerWidget {
                                 ),
                               )
                             : const Icon(Icons.payment_outlined, size: 18),
-                        label: const Text('Complete Payment'),
+                        label: Text(
+                          _isPaymentUnlocked(
+                                currentOrder?.status,
+                                currentOrder?.orderType,
+                              )
+                              ? 'Complete Payment'
+                              : 'Take Advance Payment',
+                        ),
                         style: FilledButton.styleFrom(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -420,20 +424,35 @@ class OrderSummaryPanel extends ConsumerWidget {
                     const SizedBox(height: 8),
                     SizedBox(
                       width: double.infinity,
-                      height: 44,
-                      child: FilledButton.icon(
-                        onPressed: () => ref
-                            .read(orderOperationsProvider.notifier)
-                            .newOrder(),
-                        icon: const Icon(Icons.add, size: 18),
-                        label: const Text('New Order'),
-                        style: FilledButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                      height: 40,
+                      child: OutlinedButton.icon(
+                        onPressed: orderOps.isLoading
+                            ? null
+                            : () => _showEditPaymentDialog(context, ref),
+                        icon: const Icon(Icons.edit_note_outlined, size: 18),
+                        label: const Text('Edit Payment'),
+                      ),
+                    ),
+                    if ((currentOrder?.status ?? 'open') == 'paid' ||
+                        (currentOrder?.status ?? 'open') == 'cancelled') ...[
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 44,
+                        child: FilledButton.icon(
+                          onPressed: () => ref
+                              .read(orderOperationsProvider.notifier)
+                              .newOrder(),
+                          icon: const Icon(Icons.add, size: 18),
+                          label: const Text('New Order'),
+                          style: FilledButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                   ] else ...[
                     Container(
                       width: double.infinity,
@@ -478,6 +497,98 @@ class OrderSummaryPanel extends ConsumerWidget {
       ),
     );
   }
+}
+
+void _showEditPaymentDialog(BuildContext context, WidgetRef ref) {
+  final currentOrder = ref.read(currentOrderProvider);
+  final selectedMethod = ref.read(selectedPaymentMethodProvider);
+  final amountController = TextEditingController(
+    text: (currentOrder?.grandTotal ?? 0).toStringAsFixed(2),
+  );
+  var method = selectedMethod;
+
+  showDialog(
+    context: context,
+    builder: (ctx) => StatefulBuilder(
+      builder: (ctx, setDialogState) => AlertDialog(
+        title: const Text('Edit Payment'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: amountController,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              decoration: const InputDecoration(
+                labelText: 'Amount',
+                border: OutlineInputBorder(),
+                prefixText: '₹ ',
+              ),
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              initialValue: method,
+              decoration: const InputDecoration(
+                labelText: 'Payment Method',
+                border: OutlineInputBorder(),
+              ),
+              items: const [
+                DropdownMenuItem(value: 'cash', child: Text('Cash')),
+                DropdownMenuItem(value: 'card', child: Text('Card')),
+                DropdownMenuItem(value: 'upi', child: Text('UPI')),
+              ],
+              onChanged: (value) {
+                if (value != null) {
+                  setDialogState(() {
+                    method = value;
+                  });
+                }
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final amount = double.tryParse(amountController.text.trim());
+              if (amount == null || amount <= 0) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Enter a valid amount')),
+                );
+                return;
+              }
+
+              Navigator.pop(ctx);
+              final success = await ref
+                  .read(orderOperationsProvider.notifier)
+                  .editLatestPayment(amount: amount, paymentMethod: method);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success
+                          ? 'Payment updated'
+                          : ref
+                                    .read(orderOperationsProvider)
+                                    .error
+                                    ?.toString() ??
+                                'Failed to update payment',
+                    ),
+                  ),
+                );
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 bool _isPaymentUnlocked(String? status, String? orderType) {

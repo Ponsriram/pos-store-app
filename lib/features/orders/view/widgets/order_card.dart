@@ -20,7 +20,11 @@ class OrderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final statusColor = _statusColor(order.status, colorScheme);
+    final statusColor = _statusColor(
+      order.status,
+      order.paymentStatus,
+      colorScheme,
+    );
     final dateStr = order.createdAt != null
         ? DateFormat('dd MMM, hh:mm a').format(order.createdAt!.toLocal())
         : '';
@@ -71,7 +75,7 @@ class OrderCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    _statusLabel(order.status),
+                    _statusLabel(order.status, order.paymentStatus),
                     style: textTheme.labelSmall?.copyWith(
                       color: statusColor,
                       fontWeight: FontWeight.w600,
@@ -187,7 +191,8 @@ class OrderCard extends StatelessWidget {
 
   // ---- helpers ----
 
-  String _statusLabel(String status) {
+  String _statusLabel(String status, String paymentStatus) {
+    if (paymentStatus.toLowerCase() == 'completed') return 'Paid';
     return switch (status) {
       'open' => 'Open',
       'sent_to_kitchen' => 'In Kitchen',
@@ -204,7 +209,8 @@ class OrderCard extends StatelessWidget {
     };
   }
 
-  Color _statusColor(String status, ColorScheme cs) {
+  Color _statusColor(String status, String paymentStatus, ColorScheme cs) {
+    if (paymentStatus.toLowerCase() == 'completed') return Colors.grey;
     return switch (status) {
       'open' => Colors.blue,
       'sent_to_kitchen' => Colors.orange,
