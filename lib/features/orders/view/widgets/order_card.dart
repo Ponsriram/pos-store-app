@@ -193,6 +193,10 @@ class OrderCard extends StatelessWidget {
       'sent_to_kitchen' => 'In Kitchen',
       'preparing' => 'Preparing',
       'ready' => 'Ready',
+      'served' => 'Served',
+      'handed_over' => 'Given to Customer',
+      'out_for_delivery' => 'Out for Delivery',
+      'delivered' => 'Delivered',
       'completed' => 'Completed',
       'paid' => 'Paid',
       'cancelled' => 'Cancelled',
@@ -206,6 +210,8 @@ class OrderCard extends StatelessWidget {
       'sent_to_kitchen' => Colors.orange,
       'preparing' => Colors.amber.shade700,
       'ready' => Colors.green,
+      'served' || 'handed_over' || 'delivered' => Colors.teal,
+      'out_for_delivery' => Colors.deepOrange,
       'completed' => Colors.teal,
       'paid' => Colors.grey,
       'cancelled' => cs.error,
@@ -233,8 +239,8 @@ class OrderCard extends StatelessWidget {
 
   String _paymentLabel(String status) {
     return switch (status) {
-      'unpaid' => 'Unpaid',
-      'paid' => 'Paid',
+      'pending' => 'Pending',
+      'completed' => 'Paid',
       'partial' => 'Partial',
       'refunded' => 'Refunded',
       _ => status,
@@ -243,8 +249,8 @@ class OrderCard extends StatelessWidget {
 
   Color _paymentColor(String status, ColorScheme cs) {
     return switch (status) {
-      'unpaid' => Colors.orange,
-      'paid' => Colors.green,
+      'pending' => Colors.orange,
+      'completed' => Colors.green,
       'partial' => Colors.blue,
       'refunded' => cs.error,
       _ => cs.onSurfaceVariant,

@@ -13,7 +13,12 @@ class OrderFilterTabs extends ConsumerWidget {
     'sent_to_kitchen': 'In Kitchen',
     'preparing': 'Preparing',
     'ready': 'Ready',
+    'served': 'Served',
+    'handed_over': 'Given to Customer',
+    'out_for_delivery': 'Out for Delivery',
+    'delivered': 'Delivered',
     'completed': 'Completed',
+    'paid': 'Paid',
     'cancelled': 'Cancelled',
   };
 

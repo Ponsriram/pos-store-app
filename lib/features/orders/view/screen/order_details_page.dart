@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import '../../../home/model/order.dart';
+import '../../../home/repository/order_repository.dart';
 import '../../viewmodel/orders_viewmodel.dart';
 
 /// Full-screen dialog showing order details with actions.
@@ -17,11 +18,35 @@ class OrderDetailsPage extends ConsumerStatefulWidget {
 
 class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
   late Order _order;
+  bool _isRefreshing = false;
 
   @override
   void initState() {
     super.initState();
     _order = widget.order;
+    _refreshOrder();
+  }
+
+  Future<void> _refreshOrder() async {
+    if (_isRefreshing) return;
+    setState(() {
+      _isRefreshing = true;
+    });
+
+    final latest = await ref
+        .read(orderRepositoryProvider)
+        .getOrderById(_order.id);
+
+    if (!mounted) return;
+    latest.fold((_) {}, (order) {
+      _order = order;
+    });
+
+    if (mounted) {
+      setState(() {
+        _isRefreshing = false;
+      });
+    }
   }
 
   @override
@@ -42,22 +67,17 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
         title: Text('Order #${_order.orderNumber}'),
         centerTitle: false,
         actions: [
-          if (!_isTerminalState(_order.status)) ...[
-            _StatusActionButton(
-              label: _nextStatusLabel(_order.status),
-              icon: _nextStatusIcon(_order.status),
-              color: Colors.green,
-              onPressed: ops.isLoading ? null : () => _advanceStatus(),
-            ),
-            const SizedBox(width: 8),
-            _StatusActionButton(
-              label: 'Cancel',
-              icon: Icons.cancel_outlined,
-              color: colorScheme.error,
-              onPressed: ops.isLoading ? null : () => _showCancelDialog(),
-            ),
-            const SizedBox(width: 16),
-          ],
+          IconButton(
+            tooltip: 'Refresh',
+            onPressed: _isRefreshing ? null : _refreshOrder,
+            icon: _isRefreshing
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.refresh),
+          ),
         ],
       ),
       body: Row(
@@ -179,7 +199,7 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
 
                   // Pay button
                   if (_order.paymentStatus != 'completed' &&
-                      _order.status != 'cancelled')
+                      _isPaymentUnlocked(_order))
                     SizedBox(
                       width: double.infinity,
                       child: FilledButton.icon(
@@ -188,6 +208,24 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
                             : () => _showPaymentDialog(total),
                         icon: const Icon(Icons.payment),
                         label: const Text('Process Payment'),
+                      ),
+                    )
+                  else if (_order.paymentStatus != 'completed')
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        'Payment will unlock once kitchen/service flow is done for this order type.',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
                       ),
                     ),
                 ],
@@ -259,59 +297,6 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
     );
   }
 
-  Future<void> _advanceStatus() async {
-    final nextStatus = _nextStatus(_order.status);
-    if (nextStatus == null) return;
-    final success = await ref
-        .read(ordersPageOperationsProvider.notifier)
-        .updateStatus(_order.id, nextStatus);
-    if (success && mounted) {
-      setState(() {
-        _order = _order.copyWith(status: nextStatus);
-      });
-    }
-  }
-
-  void _showCancelDialog() {
-    final controller = TextEditingController();
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Cancel Order'),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(
-            labelText: 'Reason for cancellation',
-            border: OutlineInputBorder(),
-          ),
-          maxLines: 3,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Back'),
-          ),
-          FilledButton(
-            onPressed: () async {
-              final reason = controller.text.trim();
-              if (reason.isEmpty) return;
-              Navigator.pop(ctx);
-              final success = await ref
-                  .read(ordersPageOperationsProvider.notifier)
-                  .cancelOrder(_order.id, reason);
-              if (success && mounted) {
-                setState(() {
-                  _order = _order.copyWith(status: 'cancelled');
-                });
-              }
-            },
-            child: const Text('Cancel Order'),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _showPaymentDialog(double total) {
     String method = 'cash';
     showDialog(
@@ -358,11 +343,15 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
                       amount: total,
                     );
                 if (success && mounted) {
-                  setState(() {
-                    _order = _order.copyWith(
-                      paymentStatus: 'completed',
-                      status: 'paid',
-                    );
+                  final latest = await ref
+                      .read(orderRepositoryProvider)
+                      .getOrderById(_order.id);
+                  latest.fold((_) {}, (order) {
+                    if (mounted) {
+                      setState(() {
+                        _order = order;
+                      });
+                    }
                   });
                 }
               },
@@ -376,38 +365,21 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
 
   // ---- Helpers ----
 
-  bool _isTerminalState(String status) =>
-      status == 'paid' || status == 'cancelled';
+  bool _isPaymentUnlocked(Order order) {
+    final status = order.status.toLowerCase();
+    final type = order.orderType.toLowerCase();
 
-  String? _nextStatus(String status) {
-    return switch (status) {
-      'open' => 'sent_to_kitchen',
-      'sent_to_kitchen' => 'preparing',
-      'preparing' => 'ready',
-      'ready' => 'completed',
-      _ => null,
-    };
-  }
-
-  String _nextStatusLabel(String status) {
-    final next = _nextStatus(status);
-    return switch (next) {
-      'sent_to_kitchen' => 'Send to Kitchen',
-      'preparing' => 'Start Prep',
-      'ready' => 'Mark Ready',
-      'completed' => 'Complete',
-      _ => 'Advance',
-    };
-  }
-
-  IconData _nextStatusIcon(String status) {
-    return switch (status) {
-      'open' => Icons.restaurant_outlined,
-      'sent_to_kitchen' => Icons.soup_kitchen_outlined,
-      'preparing' => Icons.done_all,
-      'ready' => Icons.task_alt,
-      _ => Icons.arrow_forward,
-    };
+    if (status == 'paid' || status == 'completed') return true;
+    if (type == 'dine_in') return status == 'served' || status == 'ready';
+    if (type == 'takeaway' || type == 'take_away') {
+      return status == 'ready' || status == 'handed_over';
+    }
+    if (type == 'delivery' || type == 'aggregator') {
+      return status == 'ready' ||
+          status == 'out_for_delivery' ||
+          status == 'delivered';
+    }
+    return false;
   }
 
   String _orderTypeLabel(String type) {
@@ -423,33 +395,6 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
 // ---------------------------------------------------------------------------
 // Small reusable widgets
 // ---------------------------------------------------------------------------
-
-class _StatusActionButton extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final Color color;
-  final VoidCallback? onPressed;
-
-  const _StatusActionButton({
-    required this.label,
-    required this.icon,
-    required this.color,
-    this.onPressed,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return FilledButton.tonalIcon(
-      onPressed: onPressed,
-      icon: Icon(icon, size: 18),
-      label: Text(label),
-      style: FilledButton.styleFrom(
-        foregroundColor: color,
-        backgroundColor: color.withValues(alpha: 0.12),
-      ),
-    );
-  }
-}
 
 class _InfoRow extends StatelessWidget {
   final String label;
@@ -506,6 +451,10 @@ class _StatusBadge extends StatelessWidget {
     'sent_to_kitchen' => 'Sent to Kitchen',
     'preparing' => 'Preparing',
     'ready' => 'Ready',
+    'served' => 'Served',
+    'handed_over' => 'Handed Over',
+    'out_for_delivery' => 'Out for Delivery',
+    'delivered' => 'Delivered',
     'completed' => 'Completed',
     'paid' => 'Paid',
     'cancelled' => 'Cancelled',
@@ -517,6 +466,8 @@ class _StatusBadge extends StatelessWidget {
     'sent_to_kitchen' => Colors.orange,
     'preparing' => Colors.amber.shade700,
     'ready' => Colors.green,
+    'served' || 'handed_over' || 'delivered' => Colors.teal,
+    'out_for_delivery' => Colors.deepOrange,
     'completed' => Colors.teal,
     'paid' => Colors.grey,
     'cancelled' => cs.error,

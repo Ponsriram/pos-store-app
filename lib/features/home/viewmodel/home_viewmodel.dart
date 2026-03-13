@@ -358,8 +358,20 @@ class OrderOperations extends _$OrderOperations {
     final paymentMethod = ref.read(selectedPaymentMethodProvider);
     final currentOrder = ref.read(currentOrderProvider);
 
+    if (currentOrder == null) {
+      state = AsyncError('No active order found', StackTrace.current);
+      return false;
+    }
+    if (!_isPaymentUnlocked(currentOrder.status, currentOrder.orderType)) {
+      state = AsyncError(
+        'Order is not ready for payment yet',
+        StackTrace.current,
+      );
+      return false;
+    }
+
     // Use grandTotal from the order (mapped from net_amount), or compute from cart
-    double amount = currentOrder?.grandTotal ?? 0;
+    double amount = currentOrder.grandTotal;
     if (amount == 0) {
       final cartItems = ref.read(cartProvider);
       amount = cartItems.fold<double>(
@@ -449,8 +461,21 @@ class OrderOperations extends _$OrderOperations {
 
   /// Legacy: place order + pay in one step (kept for backwards compat).
   Future<bool> placeOrder() async {
-    final saved = await saveOrder();
-    if (!saved) return false;
-    return completePayment();
+    return saveOrder();
+  }
+
+  bool _isPaymentUnlocked(String status, String orderType) {
+    final s = status.toLowerCase();
+    final t = orderType.toLowerCase();
+
+    if (s == 'paid' || s == 'completed') return true;
+    if (t == 'dine_in') return s == 'served' || s == 'ready';
+    if (t == 'takeaway' || t == 'take_away') {
+      return s == 'ready' || s == 'handed_over';
+    }
+    if (t == 'delivery' || t == 'aggregator') {
+      return s == 'ready' || s == 'out_for_delivery' || s == 'delivered';
+    }
+    return false;
   }
 }

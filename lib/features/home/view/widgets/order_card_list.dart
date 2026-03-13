@@ -163,8 +163,11 @@ class _OrderCard extends StatelessWidget {
       'confirmed' || 'sent_to_kitchen' => 0.3,
       'preparing' => 0.5,
       'ready' => 0.8,
+      'out_for_delivery' => 0.9,
+      'handed_over' => 0.95,
       'served' || 'delivered' => 0.95,
       'completed' => 1.0,
+      'paid' => 1.0,
       _ => 0.0,
     };
   }
@@ -176,9 +179,12 @@ class _OrderCard extends StatelessWidget {
       'sent_to_kitchen' => 'In Kitchen',
       'preparing' => 'Cooking',
       'ready' => 'Ready',
+      'handed_over' => 'Given to Customer',
+      'out_for_delivery' => 'Out for Delivery',
       'served' => 'Served',
       'delivered' => 'Delivered',
       'completed' => 'Done',
+      'paid' => 'Paid',
       'cancelled' => 'Cancelled',
       _ => status,
     };
@@ -190,7 +196,9 @@ class _OrderCard extends StatelessWidget {
       'confirmed' => Colors.blue,
       'sent_to_kitchen' || 'preparing' => cs.primary,
       'ready' => Colors.green,
+      'out_for_delivery' => Colors.deepOrange,
       'served' || 'delivered' || 'completed' => Colors.teal,
+      'paid' => Colors.grey,
       'cancelled' => cs.error,
       _ => cs.onSurfaceVariant,
     };

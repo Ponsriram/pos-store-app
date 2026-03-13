@@ -336,9 +336,13 @@ class OrderSummaryPanel extends ConsumerWidget {
                     const SizedBox(height: 8),
                   ],
 
-                  // Complete Payment — only when not already paid and order has been sent
-                  if (currentOrder?.paymentStatus != 'completed' &&
-                      (currentOrder?.status ?? 'open') != 'open') ...[
+                  // Complete Payment — only after fulfillment is completed
+                  if ((currentOrder?.paymentStatus ?? 'pending') !=
+                          'completed' &&
+                      _isPaymentUnlocked(
+                        currentOrder?.status,
+                        currentOrder?.orderType,
+                      )) ...[
                     SizedBox(
                       width: double.infinity,
                       height: 44,
@@ -384,7 +388,8 @@ class OrderSummaryPanel extends ConsumerWidget {
                         ),
                       ),
                     ),
-                  ] else ...[
+                  ] else if ((currentOrder?.paymentStatus ?? 'pending') ==
+                      'completed') ...[
                     // Payment completed banner
                     Container(
                       width: double.infinity,
@@ -429,6 +434,41 @@ class OrderSummaryPanel extends ConsumerWidget {
                         ),
                       ),
                     ),
+                  ] else ...[
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.info_outline,
+                            color: colorScheme.onSurfaceVariant,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Payment unlocks when kitchen flow is complete',
+                              maxLines: 2,
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
+                              style: textTheme.labelMedium?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ],
               ],
@@ -438,6 +478,21 @@ class OrderSummaryPanel extends ConsumerWidget {
       ),
     );
   }
+}
+
+bool _isPaymentUnlocked(String? status, String? orderType) {
+  final s = (status ?? 'open').toLowerCase();
+  final t = (orderType ?? 'dine_in').toLowerCase();
+
+  if (s == 'paid' || s == 'completed') return true;
+  if (t == 'dine_in') return s == 'served' || s == 'ready';
+  if (t == 'takeaway' || t == 'take_away') {
+    return s == 'ready' || s == 'handed_over';
+  }
+  if (t == 'delivery' || t == 'aggregator') {
+    return s == 'ready' || s == 'out_for_delivery' || s == 'delivered';
+  }
+  return false;
 }
 
 class _OrderTypeTab extends StatelessWidget {
@@ -716,9 +771,12 @@ class _TotalRow extends StatelessWidget {
 
 Color _workflowColor(String status) {
   return switch (status) {
+    'open' => Colors.blue,
     'sent_to_kitchen' => Colors.orange,
     'preparing' => Colors.amber.shade700,
     'ready' => Colors.green,
+    'served' || 'handed_over' || 'delivered' => Colors.teal,
+    'out_for_delivery' => Colors.deepOrange,
     'completed' => Colors.teal,
     'paid' => Colors.grey.shade600,
     _ => Colors.grey,
@@ -727,9 +785,14 @@ Color _workflowColor(String status) {
 
 IconData _workflowIcon(String status) {
   return switch (status) {
+    'open' => Icons.receipt_long_outlined,
     'sent_to_kitchen' => Icons.restaurant_outlined,
     'preparing' => Icons.soup_kitchen_outlined,
     'ready' => Icons.done_all,
+    'served' => Icons.room_service_outlined,
+    'handed_over' => Icons.takeout_dining,
+    'out_for_delivery' => Icons.delivery_dining,
+    'delivered' => Icons.location_on_outlined,
     'completed' => Icons.task_alt,
     'paid' => Icons.paid_outlined,
     _ => Icons.info_outline,
@@ -738,10 +801,15 @@ IconData _workflowIcon(String status) {
 
 String _workflowLabel(String status) {
   return switch (status) {
+    'open' => 'Order Taken',
     'sent_to_kitchen' => 'Sent to Kitchen',
     'preparing' => 'Preparing',
-    'ready' => 'Ready for Pickup',
-    'completed' => 'Completed',
+    'ready' => 'Ready',
+    'served' => 'Served',
+    'handed_over' => 'Given to Customer',
+    'out_for_delivery' => 'Out for Delivery',
+    'delivered' => 'Delivered',
+    'completed' => 'Fulfillment Completed',
     'paid' => 'Paid & Closed',
     _ => status,
   };
