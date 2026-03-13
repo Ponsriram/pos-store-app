@@ -483,6 +483,58 @@ class OrderOperations extends _$OrderOperations {
     return true;
   }
 
+  Future<bool> refundLatestPayment({String reason = 'Order cancelled'}) async {
+    final orderId = ref.read(currentOrderIdProvider);
+    if (orderId == null) {
+      state = AsyncError('No active order found', StackTrace.current);
+      return false;
+    }
+
+    state = const AsyncLoading();
+    final repo = ref.read(orderRepositoryProvider);
+
+    final paymentsResult = await repo.getOrderPayments(orderId);
+    if (paymentsResult.isLeft()) {
+      final failure = paymentsResult.getLeft().toNullable();
+      state = AsyncError(
+        failure?.message ?? 'Failed to fetch payments',
+        StackTrace.current,
+      );
+      return false;
+    }
+
+    final payments = paymentsResult.getRight().toNullable() ?? const [];
+    final refundable = payments.firstWhere(
+      (p) => (p['is_refund'] as bool? ?? false) == false,
+      orElse: () => const <String, dynamic>{},
+    );
+
+    final paymentId = refundable['id'] as String?;
+    final amount = (refundable['amount'] as num?)?.toDouble() ?? 0;
+    if (paymentId == null || paymentId.isEmpty || amount <= 0) {
+      state = AsyncError('No refundable payment found', StackTrace.current);
+      return false;
+    }
+
+    final refundResult = await repo.createRefund(
+      RefundCreate(paymentId: paymentId, amount: amount, reason: reason),
+    );
+
+    if (refundResult.isLeft()) {
+      final failure = refundResult.getLeft().toNullable();
+      state = AsyncError(
+        failure?.message ?? 'Failed to refund payment',
+        StackTrace.current,
+      );
+      return false;
+    }
+
+    await _refreshCurrentOrder(orderId);
+    ref.invalidate(activeOrdersProvider);
+    state = const AsyncData(null);
+    return true;
+  }
+
   /// Load an existing order into the cart for editing.
   Future<bool> loadOrder(Order order) async {
     state = const AsyncLoading();

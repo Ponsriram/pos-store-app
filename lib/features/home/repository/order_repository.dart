@@ -283,6 +283,34 @@ class OrderRepository {
     }
   }
 
+  Future<Either<Failure, Map<String, dynamic>>> createRefund(
+    RefundCreate refund,
+  ) async {
+    try {
+      if (!await connectionChecker.isConnected) {
+        return const Left(Failure('No internet connection.'));
+      }
+
+      final uri = _buildUri('${ApiEndpoints.orderPayments}/refund');
+      final response = await client.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(refund.toJson()),
+      );
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        final message = parsePydanticError(response.body);
+        return Left(Failure(message, response.statusCode));
+      }
+
+      return Right(jsonDecode(response.body) as Map<String, dynamic>);
+    } on SocketException {
+      return const Left(Failure('No internet connection.'));
+    } catch (e) {
+      return Left(Failure('Failed to create refund: $e'));
+    }
+  }
+
   // -------------------------------------------------------------------
   // Order item CRUD
   // -------------------------------------------------------------------

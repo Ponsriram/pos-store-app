@@ -62,12 +62,14 @@ class _OrderCard extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
+    final effectiveStatus = _effectiveStatus(order.status, order.paymentStatus);
     final progress = _overallProgress(
-      status: order.status,
+      status: effectiveStatus,
       paymentStatus: order.paymentStatus,
     );
+    final isCancelled = order.status.toLowerCase() == 'cancelled';
     final statusColor = _statusColor(
-      order.status,
+      effectiveStatus,
       order.paymentStatus,
       colorScheme,
     );
@@ -114,7 +116,7 @@ class _OrderCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    _statusLabel(order.status, order.paymentStatus),
+                    _statusLabel(effectiveStatus, order.paymentStatus),
                     style: textTheme.labelSmall?.copyWith(color: statusColor),
                   ),
                 ),
@@ -140,7 +142,7 @@ class _OrderCard extends StatelessWidget {
                 ),
                 const Spacer(),
                 Text(
-                  '${(progress * 100).toInt()}%',
+                  isCancelled ? 'Cancelled' : '${(progress * 100).toInt()}%',
                   style: textTheme.labelSmall?.copyWith(
                     color: statusColor,
                     fontWeight: FontWeight.bold,
@@ -149,15 +151,24 @@ class _OrderCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 4),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: progress,
-                backgroundColor: colorScheme.surfaceContainerHighest,
-                color: statusColor,
-                minHeight: 4,
+            if (!isCancelled)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: LinearProgressIndicator(
+                  value: progress,
+                  backgroundColor: colorScheme.surfaceContainerHighest,
+                  color: statusColor,
+                  minHeight: 4,
+                ),
+              )
+            else
+              Container(
+                height: 4,
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.25),
+                  borderRadius: BorderRadius.circular(4),
+                ),
               ),
-            ),
           ],
         ),
       ),
@@ -179,6 +190,20 @@ class _OrderCard extends StatelessWidget {
     };
   }
 
+  String _effectiveStatus(String status, String paymentStatus) {
+    final s = status.toLowerCase();
+    final p = paymentStatus.toLowerCase();
+
+    if (s == 'cancelled') return status;
+
+    // A settled order should not continue showing as "Ready".
+    if (s == 'ready' && p == 'completed') {
+      return 'completed';
+    }
+
+    return status;
+  }
+
   double _overallProgress({
     required String status,
     required String paymentStatus,
@@ -187,10 +212,9 @@ class _OrderCard extends StatelessWidget {
     final s = status.toLowerCase();
     final p = paymentStatus.toLowerCase();
 
-    // If fulfillment is done and payment is completed, the order is truly 100%.
+    // Order is truly complete only after fulfillment end-states.
     if (p == 'completed' &&
         {
-          'ready',
           'served',
           'handed_over',
           'delivered',
@@ -201,7 +225,8 @@ class _OrderCard extends StatelessWidget {
     }
 
     final adjusted = switch (p) {
-      'completed' => base + 0.20, // prepaid/full paid before final service
+      // Prepaid orders should still reflect kitchen/service progression.
+      'completed' => base + 0.05,
       'partial' => base + 0.10, // advance/partial payment progress
       'refunded' => (base - 0.10),
       _ => base,
@@ -213,7 +238,7 @@ class _OrderCard extends StatelessWidget {
   }
 
   String _statusLabel(String status, String paymentStatus) {
-    if (paymentStatus.toLowerCase() == 'completed') return 'Paid';
+    if (status.toLowerCase() == 'cancelled') return 'Cancelled';
     return switch (status) {
       'pending' || 'open' => 'Open',
       'confirmed' => 'Confirmed',
@@ -224,7 +249,7 @@ class _OrderCard extends StatelessWidget {
       'out_for_delivery' => 'Out for Delivery',
       'served' => 'Served',
       'delivered' => 'Delivered',
-      'completed' => 'Done',
+      'completed' => 'Paid',
       'paid' => 'Paid',
       'cancelled' => 'Cancelled',
       _ => status,
@@ -232,7 +257,7 @@ class _OrderCard extends StatelessWidget {
   }
 
   Color _statusColor(String status, String paymentStatus, ColorScheme cs) {
-    if (paymentStatus.toLowerCase() == 'completed') return Colors.grey;
+    if (status.toLowerCase() == 'cancelled') return cs.error;
     return switch (status) {
       'pending' || 'open' => Colors.orange,
       'confirmed' => Colors.blue,
@@ -240,7 +265,7 @@ class _OrderCard extends StatelessWidget {
       'ready' => Colors.green,
       'out_for_delivery' => Colors.deepOrange,
       'served' || 'delivered' || 'completed' => Colors.teal,
-      'paid' => Colors.grey,
+      'paid' => Colors.teal,
       'cancelled' => cs.error,
       _ => cs.onSurfaceVariant,
     };

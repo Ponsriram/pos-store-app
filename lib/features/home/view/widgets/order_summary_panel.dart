@@ -392,6 +392,76 @@ class OrderSummaryPanel extends ConsumerWidget {
                         ),
                       ),
                     ),
+                  ] else if ((currentOrder?.status ?? 'open') ==
+                      'cancelled') ...[
+                    if ((currentOrder?.paymentStatus ?? 'pending') !=
+                            'refunded' &&
+                        {'completed', 'partial'}.contains(
+                          (currentOrder?.paymentStatus ?? 'pending'),
+                        )) ...[
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 40,
+                        child: OutlinedButton.icon(
+                          onPressed: orderOps.isLoading
+                              ? null
+                              : () async {
+                                  final success = await ref
+                                      .read(orderOperationsProvider.notifier)
+                                      .refundLatestPayment();
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          success
+                                              ? 'Refund processed'
+                                              : ref
+                                                        .read(
+                                                          orderOperationsProvider,
+                                                        )
+                                                        .error
+                                                        ?.toString() ??
+                                                    'Refund failed',
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                          icon: const Icon(Icons.reply_outlined, size: 18),
+                          label: const Text('Refund Payment'),
+                        ),
+                      ),
+                    ] else if ((currentOrder?.paymentStatus ?? 'pending') ==
+                        'refunded') ...[
+                      const SizedBox(height: 8),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.check_circle,
+                              color: Colors.green,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Refunded',
+                              style: textTheme.labelLarge?.copyWith(
+                                color: Colors.green,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ] else if ((currentOrder?.paymentStatus ?? 'pending') ==
                       'completed') ...[
                     // Payment completed banner
@@ -890,6 +960,7 @@ Color _workflowColor(String status) {
     'out_for_delivery' => Colors.deepOrange,
     'completed' => Colors.teal,
     'paid' => Colors.grey.shade600,
+    'cancelled' => Colors.red,
     _ => Colors.grey,
   };
 }
@@ -906,6 +977,7 @@ IconData _workflowIcon(String status) {
     'delivered' => Icons.location_on_outlined,
     'completed' => Icons.task_alt,
     'paid' => Icons.paid_outlined,
+    'cancelled' => Icons.cancel,
     _ => Icons.info_outline,
   };
 }
@@ -922,6 +994,7 @@ String _workflowLabel(String status) {
     'delivered' => 'Delivered',
     'completed' => 'Fulfillment Completed',
     'paid' => 'Paid & Closed',
+    'cancelled' => 'Cancelled',
     _ => status,
   };
 }

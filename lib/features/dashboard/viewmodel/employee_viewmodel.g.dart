@@ -105,3 +105,111 @@ abstract class _$CreateEmployeeAction extends $Notifier<AsyncValue<void>> {
     element.handleCreate(ref, build);
   }
 }
+
+@ProviderFor(UpdateEmployeeAction)
+final updateEmployeeActionProvider = UpdateEmployeeActionProvider._();
+
+final class UpdateEmployeeActionProvider
+    extends $NotifierProvider<UpdateEmployeeAction, AsyncValue<void>> {
+  UpdateEmployeeActionProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'updateEmployeeActionProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$updateEmployeeActionHash();
+
+  @$internal
+  @override
+  UpdateEmployeeAction create() => UpdateEmployeeAction();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(AsyncValue<void> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<AsyncValue<void>>(value),
+    );
+  }
+}
+
+String _$updateEmployeeActionHash() =>
+    r'ae682012838d600907ccd55899351c69b5fede12';
+
+abstract class _$UpdateEmployeeAction extends $Notifier<AsyncValue<void>> {
+  AsyncValue<void> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<void>, AsyncValue<void>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<void>, AsyncValue<void>>,
+              AsyncValue<void>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(ToggleEmployeeStatusAction)
+final toggleEmployeeStatusActionProvider =
+    ToggleEmployeeStatusActionProvider._();
+
+final class ToggleEmployeeStatusActionProvider
+    extends $NotifierProvider<ToggleEmployeeStatusAction, AsyncValue<void>> {
+  ToggleEmployeeStatusActionProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'toggleEmployeeStatusActionProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$toggleEmployeeStatusActionHash();
+
+  @$internal
+  @override
+  ToggleEmployeeStatusAction create() => ToggleEmployeeStatusAction();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(AsyncValue<void> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<AsyncValue<void>>(value),
+    );
+  }
+}
+
+String _$toggleEmployeeStatusActionHash() =>
+    r'7c85cc569a9065666aff872e22e394c9d4004c0c';
+
+abstract class _$ToggleEmployeeStatusAction
+    extends $Notifier<AsyncValue<void>> {
+  AsyncValue<void> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<AsyncValue<void>, AsyncValue<void>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<void>, AsyncValue<void>>,
+              AsyncValue<void>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}

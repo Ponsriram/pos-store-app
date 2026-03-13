@@ -117,6 +117,18 @@ abstract class PaymentCreate with _$PaymentCreate {
 }
 
 @freezed
+abstract class RefundCreate with _$RefundCreate {
+  const factory RefundCreate({
+    @JsonKey(name: 'payment_id') required String paymentId,
+    required double amount,
+    required String reason,
+  }) = _RefundCreate;
+
+  factory RefundCreate.fromJson(Map<String, dynamic> json) =>
+      _$RefundCreateFromJson(json);
+}
+
+@freezed
 abstract class OrderStatusUpdate with _$OrderStatusUpdate {
   const factory OrderStatusUpdate({required String status}) =
       _OrderStatusUpdate;

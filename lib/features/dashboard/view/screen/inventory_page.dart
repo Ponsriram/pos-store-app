@@ -679,60 +679,69 @@ class _TransfersTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final transfers = ref.watch(transferListProvider);
+    final transfersAsync = ref.watch(transferListProvider);
 
-    if (transfers.isEmpty) {
-      return const Center(
-        child: Text('No transfers yet. Create a transfer to get started.'),
-      );
-    }
+    return transfersAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => _ErrorRetry(
+        message: e.toString(),
+        onRetry: () => ref.read(transferListProvider.notifier).refresh(),
+      ),
+      data: (transfers) {
+        if (transfers.isEmpty) {
+          return const Center(
+            child: Text('No transfers yet. Create a transfer to get started.'),
+          );
+        }
 
-    return _buildCardTable(
-      context: context,
-      columns: const [
-        DataColumn(label: Text('Transfer ID')),
-        DataColumn(label: Text('From Location')),
-        DataColumn(label: Text('To Location')),
-        DataColumn(label: Text('Item')),
-        DataColumn(label: Text('Quantity'), numeric: true),
-        DataColumn(label: Text('Status')),
-        DataColumn(label: Text('Created')),
-        DataColumn(label: Text('Actions')),
-      ],
-      rows: transfers
-          .map(
-            (t) => DataRow(
-              cells: [
-                DataCell(
-                  Text(
-                    t.id.length > 8 ? '${t.id.substring(0, 8)}...' : t.id,
-                    style: const TextStyle(
-                      fontFamily: 'monospace',
-                      fontSize: 12,
+        return _buildCardTable(
+          context: context,
+          columns: const [
+            DataColumn(label: Text('Transfer ID')),
+            DataColumn(label: Text('From Location')),
+            DataColumn(label: Text('To Location')),
+            DataColumn(label: Text('Item')),
+            DataColumn(label: Text('Quantity'), numeric: true),
+            DataColumn(label: Text('Status')),
+            DataColumn(label: Text('Created')),
+            DataColumn(label: Text('Actions')),
+          ],
+          rows: transfers
+              .map(
+                (t) => DataRow(
+                  cells: [
+                    DataCell(
+                      Text(
+                        t.id.length > 8 ? '${t.id.substring(0, 8)}...' : t.id,
+                        style: const TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 12,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                DataCell(Text(t.fromLocationName ?? t.fromLocationId)),
-                DataCell(Text(t.toLocationName ?? t.toLocationId)),
-                DataCell(Text(t.itemName ?? t.itemId)),
-                DataCell(Text(t.quantity.toString())),
-                DataCell(_TransferStatusBadge(status: t.status)),
-                DataCell(Text(_fmt(t.createdAt))),
-                DataCell(
-                  IconButton(
-                    icon: const Icon(Icons.update, size: 20),
-                    tooltip: 'Update Status',
-                    onPressed: () => showDialog(
-                      context: context,
-                      builder: (_) =>
-                          _UpdateTransferStatusDialog(transferId: t.id),
+                    DataCell(Text(t.fromLocationName ?? t.fromLocationId)),
+                    DataCell(Text(t.toLocationName ?? t.toLocationId)),
+                    DataCell(Text(t.itemName ?? t.itemId)),
+                    DataCell(Text(t.quantity.toString())),
+                    DataCell(_TransferStatusBadge(status: t.status)),
+                    DataCell(Text(_fmt(t.createdAt))),
+                    DataCell(
+                      IconButton(
+                        icon: const Icon(Icons.update, size: 20),
+                        tooltip: 'Update Status',
+                        onPressed: () => showDialog(
+                          context: context,
+                          builder: (_) =>
+                              _UpdateTransferStatusDialog(transferId: t.id),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
-          )
-          .toList(),
+              )
+              .toList(),
+        );
+      },
     );
   }
 }

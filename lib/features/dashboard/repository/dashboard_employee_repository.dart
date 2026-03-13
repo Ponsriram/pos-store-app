@@ -101,4 +101,49 @@ class DashboardEmployeeRepository {
       return Left(Failure('Failed to create employee: $e'));
     }
   }
+
+  // ---- Update Employee ----
+
+  Future<Either<Failure, Employee>> updateEmployee({
+    required String employeeId,
+    String? name,
+    String? phone,
+    String? email,
+    String? role,
+    bool? isActive,
+  }) async {
+    try {
+      if (!await connectionChecker.isConnected) {
+        return const Left(Failure('No internet connection.'));
+      }
+
+      final body = <String, dynamic>{};
+      if (name != null) body['name'] = name;
+      if (phone != null) body['phone'] = phone;
+      if (email != null) body['email'] = email;
+      if (role != null) body['role'] = role;
+      if (isActive != null) body['is_active'] = isActive;
+
+      final uri = _buildUri('${ApiEndpoints.employees}/$employeeId');
+      final response = await client.put(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode != 200) {
+        final message = parsePydanticError(response.body);
+        return Left(Failure(message, response.statusCode));
+      }
+
+      final updated = Employee.fromJson(
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
+      return Right(updated);
+    } on SocketException {
+      return const Left(Failure('No internet connection.'));
+    } catch (e) {
+      return Left(Failure('Failed to update employee: $e'));
+    }
+  }
 }

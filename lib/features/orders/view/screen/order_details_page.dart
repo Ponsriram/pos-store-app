@@ -159,7 +159,9 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
                   const SizedBox(height: 12),
                   _InfoRow(
                     label: 'Payment',
-                    child: _PaymentBadge(status: _order.paymentStatus),
+                    child: _PaymentBadge(
+                      status: _effectivePaymentStatus(_order),
+                    ),
                   ),
                   const SizedBox(height: 12),
                   _InfoRow(
@@ -214,7 +216,8 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
                         ),
                       ),
                     )
-                  else if (_order.paymentStatus != 'completed')
+                  else if (_order.status != 'cancelled' &&
+                      _order.paymentStatus != 'completed')
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(
@@ -232,6 +235,22 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
                         ),
                       ),
                     ),
+
+                  if (_order.status != 'cancelled' &&
+                      _order.paymentStatus != 'completed') ...[
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: ops.isLoading ? null : _showCancelDialog,
+                        icon: const Icon(Icons.cancel_outlined),
+                        label: const Text('Cancel Order'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: colorScheme.error,
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -392,6 +411,64 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
     );
   }
 
+  void _showCancelDialog() {
+    final reasonCtrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Cancel Order'),
+        content: TextField(
+          controller: reasonCtrl,
+          decoration: const InputDecoration(
+            labelText: 'Reason *',
+            border: OutlineInputBorder(),
+            hintText: 'Enter cancellation reason',
+          ),
+          maxLines: 2,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Back'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              final reason = reasonCtrl.text.trim();
+              if (reason.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Reason is required')),
+                );
+                return;
+              }
+              Navigator.pop(ctx);
+              final success = await ref
+                  .read(ordersPageOperationsProvider.notifier)
+                  .cancelOrder(_order.id, reason);
+              if (success && mounted) {
+                final latest = await ref
+                    .read(orderRepositoryProvider)
+                    .getOrderById(_order.id);
+                latest.fold((_) {}, (order) {
+                  if (mounted) {
+                    setState(() {
+                      _order = order;
+                    });
+                  }
+                });
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Order cancelled')),
+                  );
+                }
+              }
+            },
+            child: const Text('Confirm Cancel'),
+          ),
+        ],
+      ),
+    );
+  }
+
   // ---- Helpers ----
 
   bool _isPaymentUnlocked(Order order) {
@@ -409,6 +486,14 @@ class _OrderDetailsPageState extends ConsumerState<OrderDetailsPage> {
           status == 'delivered';
     }
     return false;
+  }
+
+  String _effectivePaymentStatus(Order order) {
+    if (order.status.toLowerCase() == 'cancelled' &&
+        order.paymentStatus.toLowerCase() == 'pending') {
+      return 'cancelled';
+    }
+    return order.paymentStatus;
   }
 
   String _orderTypeLabel(String type) {
@@ -512,6 +597,7 @@ class _PaymentBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = switch (status) {
+      'cancelled' => Colors.red,
       'pending' => Colors.orange,
       'completed' => Colors.green,
       'partial' => Colors.blue,

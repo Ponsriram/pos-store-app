@@ -209,7 +209,11 @@ class _EmployeeDataTable extends ConsumerWidget {
                           icon: const Icon(Icons.edit_outlined, size: 20),
                           tooltip: 'Edit',
                           onPressed: () {
-                            // Edit functionality — can be extended later
+                            showDialog(
+                              context: context,
+                              builder: (_) =>
+                                  _EditEmployeeDialog(employee: emp),
+                            );
                           },
                         ),
                         IconButton(
@@ -220,8 +224,29 @@ class _EmployeeDataTable extends ConsumerWidget {
                             size: 20,
                           ),
                           tooltip: emp.isActive ? 'Deactivate' : 'Activate',
-                          onPressed: () {
-                            // Toggle active functionality — can be extended later
+                          onPressed: () async {
+                            final success = await ref
+                                .read(
+                                  toggleEmployeeStatusActionProvider.notifier,
+                                )
+                                .setActive(
+                                  employeeId: emp.id,
+                                  isActive: !emp.isActive,
+                                );
+                            if (!success && context.mounted) {
+                              final err = ref
+                                  .read(toggleEmployeeStatusActionProvider)
+                                  .error;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    err?.toString() ??
+                                        'Failed to update employee status',
+                                  ),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
                           },
                         ),
                       ],
@@ -234,6 +259,150 @@ class _EmployeeDataTable extends ConsumerWidget {
         ),
       ),
     );
+  }
+}
+
+class _EditEmployeeDialog extends ConsumerStatefulWidget {
+  final Employee employee;
+  const _EditEmployeeDialog({required this.employee});
+
+  @override
+  ConsumerState<_EditEmployeeDialog> createState() =>
+      _EditEmployeeDialogState();
+}
+
+class _EditEmployeeDialogState extends ConsumerState<_EditEmployeeDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _nameCtrl;
+  late final TextEditingController _phoneCtrl;
+  late final TextEditingController _emailCtrl;
+  late String _selectedRole;
+
+  static const _roles = ['cashier', 'waiter', 'manager', 'chef'];
+
+  @override
+  void initState() {
+    super.initState();
+    _nameCtrl = TextEditingController(text: widget.employee.name);
+    _phoneCtrl = TextEditingController(text: widget.employee.phone ?? '');
+    _emailCtrl = TextEditingController(text: widget.employee.email ?? '');
+    _selectedRole = widget.employee.role;
+  }
+
+  @override
+  void dispose() {
+    _nameCtrl.dispose();
+    _phoneCtrl.dispose();
+    _emailCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final updateState = ref.watch(updateEmployeeActionProvider);
+
+    return AlertDialog(
+      title: const Text('Edit Employee'),
+      content: SizedBox(
+        width: 450,
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: _nameCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Name *',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (v) =>
+                      (v == null || v.trim().isEmpty) ? 'Required' : null,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _phoneCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Phone',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: _emailCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  initialValue: _selectedRole,
+                  decoration: const InputDecoration(
+                    labelText: 'Role *',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: _roles
+                      .map(
+                        (r) => DropdownMenuItem(
+                          value: r,
+                          child: Text(r[0].toUpperCase() + r.substring(1)),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (v) {
+                    if (v != null) setState(() => _selectedRole = v);
+                  },
+                ),
+                if (updateState is AsyncError) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    updateState.error.toString(),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        FilledButton(
+          onPressed: updateState is AsyncLoading ? null : _submit,
+          child: updateState is AsyncLoading
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Text('Save'),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final success = await ref
+        .read(updateEmployeeActionProvider.notifier)
+        .updateEmployee(
+          employeeId: widget.employee.id,
+          name: _nameCtrl.text.trim(),
+          phone: _phoneCtrl.text.trim().isEmpty ? null : _phoneCtrl.text.trim(),
+          email: _emailCtrl.text.trim().isEmpty ? null : _emailCtrl.text.trim(),
+          role: _selectedRole,
+        );
+    if (success && mounted) {
+      Navigator.of(context).pop();
+    }
   }
 }
 
@@ -334,7 +503,7 @@ class _AddEmployeeDialogState extends ConsumerState<_AddEmployeeDialog> {
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
-                  value: _selectedRole,
+                  initialValue: _selectedRole,
                   decoration: const InputDecoration(
                     labelText: 'Role *',
                     border: OutlineInputBorder(),
