@@ -685,7 +685,7 @@ final class OrderOperationsProvider
   }
 }
 
-String _$orderOperationsHash() => r'3bf51ee3a0064f800f33508496115b230935dc5a';
+String _$orderOperationsHash() => r'd3fe71b540ec9bdeca69c49b4a01e765dc7913aa';
 
 abstract class _$OrderOperations extends $Notifier<AsyncValue<void>> {
   AsyncValue<void> build();

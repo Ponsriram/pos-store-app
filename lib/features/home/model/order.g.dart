@@ -184,6 +184,20 @@ Map<String, dynamic> _$PaymentCreateToJson(_PaymentCreate instance) =>
       'reference': instance.reference,
     };
 
+_RefundCreate _$RefundCreateFromJson(Map<String, dynamic> json) =>
+    _RefundCreate(
+      paymentId: json['payment_id'] as String,
+      amount: (json['amount'] as num).toDouble(),
+      reason: json['reason'] as String,
+    );
+
+Map<String, dynamic> _$RefundCreateToJson(_RefundCreate instance) =>
+    <String, dynamic>{
+      'payment_id': instance.paymentId,
+      'amount': instance.amount,
+      'reason': instance.reason,
+    };
+
 _OrderStatusUpdate _$OrderStatusUpdateFromJson(Map<String, dynamic> json) =>
     _OrderStatusUpdate(status: json['status'] as String);
 

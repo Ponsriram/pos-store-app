@@ -699,7 +699,7 @@ abstract class _$UpdateRecipeAction extends $Notifier<AsyncValue<void>> {
 final transferListProvider = TransferListProvider._();
 
 final class TransferListProvider
-    extends $NotifierProvider<TransferList, List<InventoryTransfer>> {
+    extends $AsyncNotifierProvider<TransferList, List<InventoryTransfer>> {
   TransferListProvider._()
     : super(
         from: null,
@@ -717,30 +717,29 @@ final class TransferListProvider
   @$internal
   @override
   TransferList create() => TransferList();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(List<InventoryTransfer> value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<List<InventoryTransfer>>(value),
-    );
-  }
 }
 
-String _$transferListHash() => r'4a1295418fbf219b1115688497ae39f515e48beb';
+String _$transferListHash() => r'20c057843df57a294cea224073fda8c15cf72f2e';
 
-abstract class _$TransferList extends $Notifier<List<InventoryTransfer>> {
-  List<InventoryTransfer> build();
+abstract class _$TransferList extends $AsyncNotifier<List<InventoryTransfer>> {
+  FutureOr<List<InventoryTransfer>> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final ref =
-        this.ref as $Ref<List<InventoryTransfer>, List<InventoryTransfer>>;
+        this.ref
+            as $Ref<
+              AsyncValue<List<InventoryTransfer>>,
+              List<InventoryTransfer>
+            >;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<List<InventoryTransfer>, List<InventoryTransfer>>,
-              List<InventoryTransfer>,
+              AnyNotifier<
+                AsyncValue<List<InventoryTransfer>>,
+                List<InventoryTransfer>
+              >,
+              AsyncValue<List<InventoryTransfer>>,
               Object?,
               Object?
             >;
@@ -781,7 +780,7 @@ final class CreateTransferActionProvider
 }
 
 String _$createTransferActionHash() =>
-    r'17d06ada97a4d37b4b6635d4f31a128b049d1f08';
+    r'2347a5929321475724bc161a723d9b4d23f9a9e4';
 
 abstract class _$CreateTransferAction extends $Notifier<AsyncValue<void>> {
   AsyncValue<void> build();
@@ -835,7 +834,7 @@ final class UpdateTransferStatusActionProvider
 }
 
 String _$updateTransferStatusActionHash() =>
-    r'db89004c6deb7f0b0f231aa89911778b36841dc1';
+    r'734df21005015200fabb16dabd79d63c48e933bf';
 
 abstract class _$UpdateTransferStatusAction
     extends $Notifier<AsyncValue<void>> {

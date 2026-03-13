@@ -1771,6 +1771,275 @@ as String?,
 
 
 /// @nodoc
+mixin _$RefundCreate {
+
+@JsonKey(name: 'payment_id') String get paymentId; double get amount; String get reason;
+/// Create a copy of RefundCreate
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$RefundCreateCopyWith<RefundCreate> get copyWith => _$RefundCreateCopyWithImpl<RefundCreate>(this as RefundCreate, _$identity);
+
+  /// Serializes this RefundCreate to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RefundCreate&&(identical(other.paymentId, paymentId) || other.paymentId == paymentId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.reason, reason) || other.reason == reason));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,paymentId,amount,reason);
+
+@override
+String toString() {
+  return 'RefundCreate(paymentId: $paymentId, amount: $amount, reason: $reason)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $RefundCreateCopyWith<$Res>  {
+  factory $RefundCreateCopyWith(RefundCreate value, $Res Function(RefundCreate) _then) = _$RefundCreateCopyWithImpl;
+@useResult
+$Res call({
+@JsonKey(name: 'payment_id') String paymentId, double amount, String reason
+});
+
+
+
+
+}
+/// @nodoc
+class _$RefundCreateCopyWithImpl<$Res>
+    implements $RefundCreateCopyWith<$Res> {
+  _$RefundCreateCopyWithImpl(this._self, this._then);
+
+  final RefundCreate _self;
+  final $Res Function(RefundCreate) _then;
+
+/// Create a copy of RefundCreate
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? paymentId = null,Object? amount = null,Object? reason = null,}) {
+  return _then(_self.copyWith(
+paymentId: null == paymentId ? _self.paymentId : paymentId // ignore: cast_nullable_to_non_nullable
+as String,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
+as double,reason: null == reason ? _self.reason : reason // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [RefundCreate].
+extension RefundCreatePatterns on RefundCreate {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _RefundCreate value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _RefundCreate() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _RefundCreate value)  $default,){
+final _that = this;
+switch (_that) {
+case _RefundCreate():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _RefundCreate value)?  $default,){
+final _that = this;
+switch (_that) {
+case _RefundCreate() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'payment_id')  String paymentId,  double amount,  String reason)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _RefundCreate() when $default != null:
+return $default(_that.paymentId,_that.amount,_that.reason);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'payment_id')  String paymentId,  double amount,  String reason)  $default,) {final _that = this;
+switch (_that) {
+case _RefundCreate():
+return $default(_that.paymentId,_that.amount,_that.reason);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'payment_id')  String paymentId,  double amount,  String reason)?  $default,) {final _that = this;
+switch (_that) {
+case _RefundCreate() when $default != null:
+return $default(_that.paymentId,_that.amount,_that.reason);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _RefundCreate implements RefundCreate {
+  const _RefundCreate({@JsonKey(name: 'payment_id') required this.paymentId, required this.amount, required this.reason});
+  factory _RefundCreate.fromJson(Map<String, dynamic> json) => _$RefundCreateFromJson(json);
+
+@override@JsonKey(name: 'payment_id') final  String paymentId;
+@override final  double amount;
+@override final  String reason;
+
+/// Create a copy of RefundCreate
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$RefundCreateCopyWith<_RefundCreate> get copyWith => __$RefundCreateCopyWithImpl<_RefundCreate>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$RefundCreateToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _RefundCreate&&(identical(other.paymentId, paymentId) || other.paymentId == paymentId)&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.reason, reason) || other.reason == reason));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode => Object.hash(runtimeType,paymentId,amount,reason);
+
+@override
+String toString() {
+  return 'RefundCreate(paymentId: $paymentId, amount: $amount, reason: $reason)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$RefundCreateCopyWith<$Res> implements $RefundCreateCopyWith<$Res> {
+  factory _$RefundCreateCopyWith(_RefundCreate value, $Res Function(_RefundCreate) _then) = __$RefundCreateCopyWithImpl;
+@override @useResult
+$Res call({
+@JsonKey(name: 'payment_id') String paymentId, double amount, String reason
+});
+
+
+
+
+}
+/// @nodoc
+class __$RefundCreateCopyWithImpl<$Res>
+    implements _$RefundCreateCopyWith<$Res> {
+  __$RefundCreateCopyWithImpl(this._self, this._then);
+
+  final _RefundCreate _self;
+  final $Res Function(_RefundCreate) _then;
+
+/// Create a copy of RefundCreate
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? paymentId = null,Object? amount = null,Object? reason = null,}) {
+  return _then(_RefundCreate(
+paymentId: null == paymentId ? _self.paymentId : paymentId // ignore: cast_nullable_to_non_nullable
+as String,amount: null == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
+as double,reason: null == reason ? _self.reason : reason // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
 mixin _$OrderStatusUpdate {
 
  String get status;

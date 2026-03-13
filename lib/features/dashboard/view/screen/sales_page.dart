@@ -110,19 +110,15 @@ class _SalesFilters extends ConsumerWidget {
 
   static const _orderStatuses = [
     'open',
-    'sent_to_kitchen',
-    'preparing',
+    'in_kitchen',
     'ready',
-    'served',
-    'handed_over',
-    'out_for_delivery',
-    'delivered',
     'completed',
     'paid',
     'cancelled',
   ];
 
   static const _paymentStatuses = [
+    'cancelled',
     'pending',
     'partial',
     'completed',
@@ -140,9 +136,10 @@ class _SalesFilters extends ConsumerWidget {
       children: [
         // Order status
         SizedBox(
-          width: 180,
+          width: 220,
           child: DropdownButtonFormField<String>(
             initialValue: statusFilter,
+            isExpanded: true,
             decoration: const InputDecoration(
               labelText: 'Order Status',
               border: OutlineInputBorder(),
@@ -151,7 +148,13 @@ class _SalesFilters extends ConsumerWidget {
             items: [
               const DropdownMenuItem(value: null, child: Text('All')),
               ..._orderStatuses.map(
-                (s) => DropdownMenuItem(value: s, child: Text(_capitalize(s))),
+                (s) => DropdownMenuItem(
+                  value: s,
+                  child: Text(
+                    _formatStatus(s),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ),
             ],
             onChanged: (v) =>
@@ -160,9 +163,10 @@ class _SalesFilters extends ConsumerWidget {
         ),
         // Payment status
         SizedBox(
-          width: 180,
+          width: 220,
           child: DropdownButtonFormField<String>(
             initialValue: paymentFilter,
+            isExpanded: true,
             decoration: const InputDecoration(
               labelText: 'Payment Status',
               border: OutlineInputBorder(),
@@ -184,6 +188,11 @@ class _SalesFilters extends ConsumerWidget {
 
   static String _capitalize(String s) =>
       s.isEmpty ? s : '${s[0].toUpperCase()}${s.substring(1)}';
+
+  static String _formatStatus(String s) {
+    if (s == 'in_kitchen') return 'In Kitchen';
+    return _capitalize(s.replaceAll('_', ' '));
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -233,14 +242,14 @@ class _OrdersDataTable extends StatelessWidget {
                   DataCell(Text(_formatOrderType(o.orderType))),
                   DataCell(
                     _StatusBadge(
-                      label: o.status,
-                      color: _statusColor(o.status),
+                      label: _displayOrderStatusLabel(o),
+                      color: _statusColor(_displayOrderStatusLabel(o)),
                     ),
                   ),
                   DataCell(
                     _StatusBadge(
-                      label: o.paymentStatus,
-                      color: _paymentColor(o.paymentStatus),
+                      label: _displayPaymentLabel(o),
+                      color: _paymentColor(_displayPaymentLabel(o)),
                     ),
                   ),
                   DataCell(Text(o.grandTotal.toStringAsFixed(2))),
@@ -283,9 +292,23 @@ class _OrdersDataTable extends StatelessWidget {
     return switch (status) {
       'completed' => Colors.green,
       'refunded' => Colors.red,
+      'cancelled' => Colors.red,
       'partial' => Colors.orange,
       _ => Colors.grey,
     };
+  }
+
+  static String _displayPaymentLabel(Order order) {
+    if (order.status == 'cancelled' && order.paymentStatus == 'pending') {
+      return 'cancelled';
+    }
+    return order.paymentStatus;
+  }
+
+  static String _displayOrderStatusLabel(Order order) {
+    if (order.status == 'cancelled') return 'cancelled';
+    if (order.paymentStatus == 'completed') return 'paid';
+    return order.status;
   }
 }
 
@@ -305,7 +328,10 @@ class _StatusBadge extends StatelessWidget {
       child: Text(
         label.isEmpty
             ? label
-            : '${label[0].toUpperCase()}${label.substring(1)}',
+            : '${label[0].toUpperCase()}${label.substring(1)}'.replaceAll(
+                '_',
+                ' ',
+              ),
         style: TextStyle(fontSize: 12, color: color),
       ),
     );

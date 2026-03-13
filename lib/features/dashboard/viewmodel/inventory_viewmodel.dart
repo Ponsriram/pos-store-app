@@ -325,19 +325,20 @@ class UpdateRecipeAction extends _$UpdateRecipeAction {
 
 @riverpod
 class TransferList extends _$TransferList {
-  final List<InventoryTransfer> _transfers = [];
-
   @override
-  List<InventoryTransfer> build() => _transfers;
-
-  void addTransfer(InventoryTransfer transfer) {
-    state = [transfer, ...state];
+  Future<List<InventoryTransfer>> build() async {
+    final store = ref.watch(selectedStoreProvider);
+    if (store == null) return [];
+    final repo = ref.read(dashboardInventoryRepositoryProvider);
+    final result = await repo.getTransfers(storeId: store.id);
+    return result.fold(
+      (failure) => throw Exception(failure.message),
+      (transfers) => transfers,
+    );
   }
 
-  void updateStatus(String transferId, String status) {
-    state = state
-        .map((t) => t.id == transferId ? t.copyWith(status: status) : t)
-        .toList();
+  Future<void> refresh() async {
+    ref.invalidateSelf();
   }
 }
 
@@ -361,7 +362,7 @@ class CreateTransferAction extends _$CreateTransferAction {
       },
       (created) {
         state = const AsyncData(null);
-        ref.read(transferListProvider.notifier).addTransfer(created);
+        ref.invalidate(transferListProvider);
         return true;
       },
     );
@@ -388,9 +389,7 @@ class UpdateTransferStatusAction extends _$UpdateTransferStatusAction {
       },
       (_) {
         state = const AsyncData(null);
-        ref
-            .read(transferListProvider.notifier)
-            .updateStatus(transferId, status);
+        ref.invalidate(transferListProvider);
         return true;
       },
     );
