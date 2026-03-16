@@ -7,7 +7,7 @@ import '../../service/employee_auth_service.dart';
 
 class LockScreen extends ConsumerStatefulWidget {
   final VoidCallback onUnlock;
-  
+
   const LockScreen({super.key, required this.onUnlock});
 
   @override
@@ -52,12 +52,12 @@ class _LockScreenState extends ConsumerState<LockScreen> {
       }
 
       final authService = ref.read(employeeAuthServiceProvider);
-      
+
       // If not switching user, we still need the current employee code to log back in.
       // Alternatively, the backend could support just a PIN auth for the active session,
       // but assuming we need both code and pin for a full authentication:
       // If we don't have the current employee code available easily, we will force a user switch.
-      
+
       final result = await authService.login(
         employeeCode: code, // Re-authenticate via full switch for now
         pin: pin,
@@ -74,8 +74,10 @@ class _LockScreenState extends ConsumerState<LockScreen> {
         },
         (employee) async {
           // Update employee role provider
-          await ref.read(employeeRoleProvider.notifier).setRole(employee.role ?? 'Cashier');
-          
+          await ref
+              .read(employeeRoleProvider.notifier)
+              .setRole(employee.role ?? 'Cashier');
+
           if (mounted) widget.onUnlock();
         },
       );
@@ -89,9 +91,9 @@ class _LockScreenState extends ConsumerState<LockScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ref.watch(appThemeProvider);
+    final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    
+
     final surface = colors.surface;
     final primary = colors.primary;
     final textPrimary = colors.onSurface;
@@ -99,7 +101,9 @@ class _LockScreenState extends ConsumerState<LockScreen> {
     final error = colors.error;
 
     return Scaffold(
-      backgroundColor: Colors.black.withOpacity(0.8), // Semi-transparent or solid
+      backgroundColor: Colors.black.withOpacity(
+        0.8,
+      ), // Semi-transparent or solid
       body: Center(
         child: Container(
           constraints: const BoxConstraints(maxWidth: 400),
@@ -119,11 +123,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Icon(
-                Icons.lock_outline,
-                size: 64,
-                color: primary,
-              ),
+              Icon(Icons.lock_outline, size: 64, color: primary),
               const SizedBox(height: 16),
               Text(
                 'POS Locked',
@@ -146,7 +146,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
                   textAlign: TextAlign.center,
                 ),
               const SizedBox(height: 32),
-              
+
               if (_errorMessage != null)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16),
@@ -156,7 +156,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
                     textAlign: TextAlign.center,
                   ),
                 ),
-              
+
               if (_isSwitchingUser)
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16),
@@ -182,7 +182,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
                     ),
                   ),
                 ),
-                
+
               TextField(
                 controller: _pinController,
                 obscureText: true,
@@ -216,7 +216,10 @@ class _LockScreenState extends ConsumerState<LockScreen> {
                       )
                     : const Text(
                         'Unlock POS',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
               ),
             ],

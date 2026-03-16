@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/provider/theme_provider.dart';
+import 'core/theme/themes.dart';
 import 'features/auth/provider/auth_provider.dart';
 import 'features/auth/view/screen/login_page.dart';
 import 'features/auth/view/screen/store_selection_screen.dart';
@@ -22,16 +23,17 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bootstrapAsync = ref.watch(appBootstrapProvider);
-    final theme = ref.watch(appThemeProvider);
+    final themeMode = ref.watch(appThemeModeProvider);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Nosh POS',
-      theme: theme,
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: themeMode,
       home: bootstrapAsync.when(
-        loading: () => const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        ),
+        loading: () =>
+            const Scaffold(body: Center(child: CircularProgressIndicator())),
         error: (_, _) => const LoginPage(),
         data: (state) => switch (state) {
           AppBootstrapState.login => const LoginPage(),
