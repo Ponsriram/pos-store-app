@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/utils/show_snackbar.dart';
-import '../../../home/view/screen/home_page.dart';
+import '../../provider/auth_provider.dart';
 import '../../viewmodel/auth_viewmodel.dart';
 import '../widgets/login_form.dart';
 import '../widgets/login_left_panel.dart';
+import 'store_selection_screen.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -41,8 +42,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       if (next == null) return;
       next.whenOrNull(
         data: (_) {
+          // Re-evaluate bootstrap and go to store selection
+          ref.read(appBootstrapProvider.notifier).reevaluate();
           Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(builder: (_) => const HomePage()),
+            MaterialPageRoute(builder: (_) => const StoreSelectionScreen()),
             (_) => false,
           );
         },
