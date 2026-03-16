@@ -55,7 +55,7 @@ class EmployeeAuthService {
       }
 
       final uri = _buildUri(ApiEndpoints.employeeLogin);
-      
+
       final requestBody = EmployeeLoginRequest(
         employeeCode: employeeCode,
         pin: pin,
@@ -83,7 +83,9 @@ class EmployeeAuthService {
       }
 
       final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-      log("JSON: $jsonResponse"); log("JSON_RESPONSE=$jsonResponse"); final employeeResponse = EmployeeLoginResponse.fromJson(jsonResponse);
+      log("JSON: $jsonResponse");
+      log("JSON_RESPONSE=$jsonResponse");
+      final employeeResponse = EmployeeLoginResponse.fromJson(jsonResponse);
 
       // Persist to local storage
       await localStorage.setEmployee(
@@ -93,7 +95,9 @@ class EmployeeAuthService {
         employeeResponse.role ?? 'Cashier',
       );
 
-      log('EmployeeAuthService: login successful for ${employeeResponse.employeeName}');
+      log(
+        'EmployeeAuthService: login successful for ${employeeResponse.employeeName}',
+      );
       return Right(employeeResponse);
     } catch (e, st) {
       log('EmployeeAuthService: error login - $e\n$st');
@@ -111,7 +115,7 @@ class EmployeeAuthService {
     // Though we haven't explicit wrapper method in local_storage, we could access it directly
     // Let's rely on employee role or just returning true if token exists. Wait, we may need a wrapper or DB call for name.
     // For now we persist it correctly.
-    return localStorage.getEmployeeToken(); 
+    return localStorage.getEmployeeToken();
   }
 
   /// Clear the current employee session.
