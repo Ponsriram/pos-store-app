@@ -126,6 +126,7 @@ _OrderCreate _$OrderCreateFromJson(Map<String, dynamic> json) => _OrderCreate(
   employeeId: json['employee_id'] as String?,
   terminalId: json['terminal_id'] as String?,
   tableNumber: (json['table_number'] as num?)?.toInt(),
+  shiftId: json['shift_id'] as String?,
   orderType: json['order_type'] as String? ?? 'dine_in',
   channel: json['channel'] as String? ?? 'pos',
   discountAmount: (json['discount_amount'] as num?)?.toDouble() ?? 0,
@@ -142,6 +143,7 @@ Map<String, dynamic> _$OrderCreateToJson(_OrderCreate instance) =>
       'employee_id': instance.employeeId,
       'terminal_id': instance.terminalId,
       'table_number': instance.tableNumber,
+      'shift_id': instance.shiftId,
       'order_type': instance.orderType,
       'channel': instance.channel,
       'discount_amount': instance.discountAmount,
@@ -182,6 +184,20 @@ Map<String, dynamic> _$PaymentCreateToJson(_PaymentCreate instance) =>
       'amount': instance.amount,
       'tip_amount': instance.tipAmount,
       'reference': instance.reference,
+    };
+
+_RefundCreate _$RefundCreateFromJson(Map<String, dynamic> json) =>
+    _RefundCreate(
+      paymentId: json['payment_id'] as String,
+      amount: (json['amount'] as num).toDouble(),
+      reason: json['reason'] as String,
+    );
+
+Map<String, dynamic> _$RefundCreateToJson(_RefundCreate instance) =>
+    <String, dynamic>{
+      'payment_id': instance.paymentId,
+      'amount': instance.amount,
+      'reason': instance.reason,
     };
 
 _OrderStatusUpdate _$OrderStatusUpdateFromJson(Map<String, dynamic> json) =>

@@ -109,15 +109,23 @@ class _SalesFilters extends ConsumerWidget {
   const _SalesFilters();
 
   static const _orderStatuses = [
-    'pending',
+    'open',
+    'sent_to_kitchen',
     'preparing',
     'ready',
     'served',
     'completed',
+    'paid',
     'cancelled',
   ];
 
-  static const _paymentStatuses = ['unpaid', 'partial', 'paid', 'refunded'];
+  static const _paymentStatuses = [
+    'cancelled',
+    'pending',
+    'partial',
+    'completed',
+    'refunded',
+  ];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -130,9 +138,10 @@ class _SalesFilters extends ConsumerWidget {
       children: [
         // Order status
         SizedBox(
-          width: 180,
+          width: 220,
           child: DropdownButtonFormField<String>(
-            value: statusFilter,
+            initialValue: statusFilter,
+            isExpanded: true,
             decoration: const InputDecoration(
               labelText: 'Order Status',
               border: OutlineInputBorder(),
@@ -141,7 +150,13 @@ class _SalesFilters extends ConsumerWidget {
             items: [
               const DropdownMenuItem(value: null, child: Text('All')),
               ..._orderStatuses.map(
-                (s) => DropdownMenuItem(value: s, child: Text(_capitalize(s))),
+                (s) => DropdownMenuItem(
+                  value: s,
+                  child: Text(
+                    _formatStatus(s),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ),
             ],
             onChanged: (v) =>
@@ -150,9 +165,10 @@ class _SalesFilters extends ConsumerWidget {
         ),
         // Payment status
         SizedBox(
-          width: 180,
+          width: 220,
           child: DropdownButtonFormField<String>(
-            value: paymentFilter,
+            initialValue: paymentFilter,
+            isExpanded: true,
             decoration: const InputDecoration(
               labelText: 'Payment Status',
               border: OutlineInputBorder(),
@@ -174,6 +190,11 @@ class _SalesFilters extends ConsumerWidget {
 
   static String _capitalize(String s) =>
       s.isEmpty ? s : '${s[0].toUpperCase()}${s.substring(1)}';
+
+  static String _formatStatus(String s) {
+    if (s == 'in_kitchen') return 'In Kitchen';
+    return _capitalize(s.replaceAll('_', ' '));
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -223,14 +244,14 @@ class _OrdersDataTable extends StatelessWidget {
                   DataCell(Text(_formatOrderType(o.orderType))),
                   DataCell(
                     _StatusBadge(
-                      label: o.status,
-                      color: _statusColor(o.status),
+                      label: _displayOrderStatusLabel(o),
+                      color: _statusColor(_displayOrderStatusLabel(o)),
                     ),
                   ),
                   DataCell(
                     _StatusBadge(
-                      label: o.paymentStatus,
-                      color: _paymentColor(o.paymentStatus),
+                      label: _displayPaymentLabel(o),
+                      color: _paymentColor(_displayPaymentLabel(o)),
                     ),
                   ),
                   DataCell(Text(o.grandTotal.toStringAsFixed(2))),
@@ -271,11 +292,25 @@ class _OrdersDataTable extends StatelessWidget {
 
   static Color _paymentColor(String status) {
     return switch (status) {
-      'paid' => Colors.green,
+      'completed' => Colors.green,
       'refunded' => Colors.red,
+      'cancelled' => Colors.red,
       'partial' => Colors.orange,
       _ => Colors.grey,
     };
+  }
+
+  static String _displayPaymentLabel(Order order) {
+    if (order.status == 'cancelled' && order.paymentStatus == 'pending') {
+      return 'cancelled';
+    }
+    return order.paymentStatus;
+  }
+
+  static String _displayOrderStatusLabel(Order order) {
+    if (order.status == 'cancelled') return 'cancelled';
+    if (order.paymentStatus == 'completed') return 'paid';
+    return order.status;
   }
 }
 
@@ -295,7 +330,10 @@ class _StatusBadge extends StatelessWidget {
       child: Text(
         label.isEmpty
             ? label
-            : '${label[0].toUpperCase()}${label.substring(1)}',
+            : '${label[0].toUpperCase()}${label.substring(1)}'.replaceAll(
+                '_',
+                ' ',
+              ),
         style: TextStyle(fontSize: 12, color: color),
       ),
     );
@@ -328,7 +366,8 @@ class _OrderDetailPanel extends ConsumerWidget {
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const Spacer(),
-            if (order.paymentStatus != 'paid')
+            if (order.status != 'cancelled' &&
+                order.paymentStatus != 'completed')
               FilledButton.icon(
                 onPressed: () => _showRecordPaymentDialog(context, ref, order),
                 icon: const Icon(Icons.payment),
@@ -417,7 +456,7 @@ class _OrderDetailPanel extends ConsumerWidget {
                         Expanded(
                           child: ListView.separated(
                             itemCount: order.items.length,
-                            separatorBuilder: (_, __) =>
+                            separatorBuilder: (_, _) =>
                                 const Divider(height: 1),
                             itemBuilder: (_, i) {
                               final item = order.items[i];
@@ -559,7 +598,7 @@ class _RecordPaymentDialogState extends ConsumerState<_RecordPaymentDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               DropdownButtonFormField<String>(
-                value: _method,
+                initialValue: _method,
                 decoration: const InputDecoration(
                   labelText: 'Payment Method',
                   border: OutlineInputBorder(),

@@ -20,9 +20,14 @@ class OrderCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final statusColor = _statusColor(order.status, colorScheme);
+    final effectiveStatus = _effectiveStatus(order.status, order.paymentStatus);
+    final statusColor = _statusColor(
+      effectiveStatus,
+      order.paymentStatus,
+      colorScheme,
+    );
     final dateStr = order.createdAt != null
-        ? DateFormat('dd MMM, hh:mm a').format(order.createdAt!)
+        ? DateFormat('dd MMM, hh:mm a').format(order.createdAt!.toLocal())
         : '';
 
     final total = order.grandTotal > 0
@@ -71,7 +76,7 @@ class OrderCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    _statusLabel(order.status),
+                    _statusLabel(effectiveStatus, order.paymentStatus),
                     style: textTheme.labelSmall?.copyWith(
                       color: statusColor,
                       fontWeight: FontWeight.w600,
@@ -164,15 +169,29 @@ class OrderCard extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: _paymentColor(
-                      order.paymentStatus,
+                      _effectivePaymentStatus(
+                        order.status,
+                        order.paymentStatus,
+                      ),
                       colorScheme,
                     ).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    _paymentLabel(order.paymentStatus),
+                    _paymentLabel(
+                      _effectivePaymentStatus(
+                        order.status,
+                        order.paymentStatus,
+                      ),
+                    ),
                     style: textTheme.labelSmall?.copyWith(
-                      color: _paymentColor(order.paymentStatus, colorScheme),
+                      color: _paymentColor(
+                        _effectivePaymentStatus(
+                          order.status,
+                          order.paymentStatus,
+                        ),
+                        colorScheme,
+                      ),
                       fontSize: 10,
                     ),
                   ),
@@ -187,28 +206,49 @@ class OrderCard extends StatelessWidget {
 
   // ---- helpers ----
 
-  String _statusLabel(String status) {
+  String _effectiveStatus(String status, String paymentStatus) {
+    final s = status.toLowerCase();
+    final p = paymentStatus.toLowerCase();
+
+    if (s == 'cancelled') return status;
+
+    // A settled order should not continue showing as "Ready".
+    if (s == 'ready' && p == 'completed') {
+      return 'completed';
+    }
+
+    return status;
+  }
+
+  String _statusLabel(String status, String paymentStatus) {
+    if (status.toLowerCase() == 'paid') return 'Completed';
     return switch (status) {
-      'pending' => 'Pending',
-      'confirmed' => 'Confirmed',
-      'preparing' || 'in_kitchen' => 'Preparing',
+      'open' => 'Open',
+      'sent_to_kitchen' => 'In Kitchen',
+      'preparing' => 'Preparing',
       'ready' => 'Ready',
       'served' => 'Served',
+      'handed_over' => 'Given to Customer',
+      'out_for_delivery' => 'Out for Delivery',
       'delivered' => 'Delivered',
       'completed' => 'Completed',
+      'paid' => 'Completed',
       'cancelled' => 'Cancelled',
       _ => status,
     };
   }
 
-  Color _statusColor(String status, ColorScheme cs) {
+  Color _statusColor(String status, String paymentStatus, ColorScheme cs) {
+    if (status.toLowerCase() == 'paid') return Colors.teal;
     return switch (status) {
-      'pending' => Colors.orange,
-      'confirmed' => Colors.blue,
-      'preparing' || 'in_kitchen' => Colors.amber.shade700,
+      'open' => Colors.blue,
+      'sent_to_kitchen' => Colors.orange,
+      'preparing' => Colors.amber.shade700,
       'ready' => Colors.green,
-      'served' || 'delivered' => Colors.teal,
-      'completed' => Colors.grey,
+      'served' || 'handed_over' || 'delivered' => Colors.teal,
+      'out_for_delivery' => Colors.deepOrange,
+      'completed' => Colors.teal,
+      'paid' => Colors.teal,
       'cancelled' => cs.error,
       _ => cs.onSurfaceVariant,
     };
@@ -234,8 +274,9 @@ class OrderCard extends StatelessWidget {
 
   String _paymentLabel(String status) {
     return switch (status) {
-      'unpaid' => 'Unpaid',
-      'paid' => 'Paid',
+      'cancelled' => 'Cancelled',
+      'pending' => 'Pending',
+      'completed' => 'Paid',
       'partial' => 'Partial',
       'refunded' => 'Refunded',
       _ => status,
@@ -244,11 +285,20 @@ class OrderCard extends StatelessWidget {
 
   Color _paymentColor(String status, ColorScheme cs) {
     return switch (status) {
-      'unpaid' => Colors.orange,
-      'paid' => Colors.green,
+      'cancelled' => cs.error,
+      'pending' => Colors.orange,
+      'completed' => Colors.green,
       'partial' => Colors.blue,
       'refunded' => cs.error,
       _ => cs.onSurfaceVariant,
     };
+  }
+
+  String _effectivePaymentStatus(String orderStatus, String paymentStatus) {
+    if (orderStatus.toLowerCase() == 'cancelled' &&
+        paymentStatus.toLowerCase() == 'pending') {
+      return 'cancelled';
+    }
+    return paymentStatus;
   }
 }

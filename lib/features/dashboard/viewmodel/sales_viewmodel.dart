@@ -21,17 +21,52 @@ class SalesOrderList extends _$SalesOrderList {
     final repo = ref.read(dashboardSalesRepositoryProvider);
     final result = await repo.getOrders(
       storeId: store.id,
-      status: statusFilter,
-      paymentStatus: paymentFilter,
+      paymentStatus: paymentFilter == 'cancelled' ? null : paymentFilter,
     );
-    return result.fold(
-      (failure) => throw Exception(failure.message),
-      (orders) => orders,
-    );
+    return result.fold((failure) => throw Exception(failure.message), (orders) {
+      var filtered = orders;
+
+      if (paymentFilter == 'cancelled') {
+        filtered = filtered
+            .where((o) => o.status.toLowerCase() == 'cancelled')
+            .toList(growable: false);
+      }
+
+      if (statusFilter == null) return filtered;
+      return filtered
+          .where((o) => _matchesSalesStatus(o, statusFilter))
+          .toList(growable: false);
+    });
   }
 
   Future<void> refresh() async {
     ref.invalidateSelf();
+  }
+
+  bool _matchesSalesStatus(Order order, String filter) {
+    final status = order.status.toLowerCase();
+    final payment = order.paymentStatus.toLowerCase();
+
+    if (filter == 'paid') {
+      return payment == 'completed' || status == 'paid';
+    }
+
+    return switch (filter) {
+      'open' => status == 'open' && payment != 'completed',
+      'in_kitchen' => status == 'sent_to_kitchen' || status == 'preparing',
+      'ready' =>
+        payment != 'completed' &&
+            {
+              'ready',
+              'served',
+              'handed_over',
+              'out_for_delivery',
+              'delivered',
+            }.contains(status),
+      'completed' => status == 'completed',
+      'cancelled' => status == 'cancelled',
+      _ => status == filter,
+    };
   }
 }
 

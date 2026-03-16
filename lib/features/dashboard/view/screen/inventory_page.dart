@@ -638,7 +638,7 @@ class _RecipesTabState extends ConsumerState<_RecipesTab> {
                         ),
                       ),
                       DataCell(Text(r.description ?? '---')),
-                      DataCell(Text(r.ingredients.length.toString())),
+                      DataCell(Text(r.lines.length.toString())),
                       DataCell(Text(_fmt(r.createdAt))),
                       DataCell(
                         IconButton(
@@ -679,60 +679,69 @@ class _TransfersTab extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final transfers = ref.watch(transferListProvider);
+    final transfersAsync = ref.watch(transferListProvider);
 
-    if (transfers.isEmpty) {
-      return const Center(
-        child: Text('No transfers yet. Create a transfer to get started.'),
-      );
-    }
+    return transfersAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (e, _) => _ErrorRetry(
+        message: e.toString(),
+        onRetry: () => ref.read(transferListProvider.notifier).refresh(),
+      ),
+      data: (transfers) {
+        if (transfers.isEmpty) {
+          return const Center(
+            child: Text('No transfers yet. Create a transfer to get started.'),
+          );
+        }
 
-    return _buildCardTable(
-      context: context,
-      columns: const [
-        DataColumn(label: Text('Transfer ID')),
-        DataColumn(label: Text('From Location')),
-        DataColumn(label: Text('To Location')),
-        DataColumn(label: Text('Item')),
-        DataColumn(label: Text('Quantity'), numeric: true),
-        DataColumn(label: Text('Status')),
-        DataColumn(label: Text('Created')),
-        DataColumn(label: Text('Actions')),
-      ],
-      rows: transfers
-          .map(
-            (t) => DataRow(
-              cells: [
-                DataCell(
-                  Text(
-                    t.id.length > 8 ? '${t.id.substring(0, 8)}...' : t.id,
-                    style: const TextStyle(
-                      fontFamily: 'monospace',
-                      fontSize: 12,
+        return _buildCardTable(
+          context: context,
+          columns: const [
+            DataColumn(label: Text('Transfer ID')),
+            DataColumn(label: Text('From Location')),
+            DataColumn(label: Text('To Location')),
+            DataColumn(label: Text('Item')),
+            DataColumn(label: Text('Quantity'), numeric: true),
+            DataColumn(label: Text('Status')),
+            DataColumn(label: Text('Created')),
+            DataColumn(label: Text('Actions')),
+          ],
+          rows: transfers
+              .map(
+                (t) => DataRow(
+                  cells: [
+                    DataCell(
+                      Text(
+                        t.id.length > 8 ? '${t.id.substring(0, 8)}...' : t.id,
+                        style: const TextStyle(
+                          fontFamily: 'monospace',
+                          fontSize: 12,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                DataCell(Text(t.fromLocationName ?? t.fromLocationId)),
-                DataCell(Text(t.toLocationName ?? t.toLocationId)),
-                DataCell(Text(t.itemName ?? t.itemId)),
-                DataCell(Text(t.quantity.toString())),
-                DataCell(_TransferStatusBadge(status: t.status)),
-                DataCell(Text(_fmt(t.createdAt))),
-                DataCell(
-                  IconButton(
-                    icon: const Icon(Icons.update, size: 20),
-                    tooltip: 'Update Status',
-                    onPressed: () => showDialog(
-                      context: context,
-                      builder: (_) =>
-                          _UpdateTransferStatusDialog(transferId: t.id),
+                    DataCell(Text(t.fromLocationName ?? t.fromLocationId)),
+                    DataCell(Text(t.toLocationName ?? t.toLocationId)),
+                    DataCell(Text(t.itemName ?? t.itemId)),
+                    DataCell(Text(t.quantity.toString())),
+                    DataCell(_TransferStatusBadge(status: t.status)),
+                    DataCell(Text(_fmt(t.createdAt))),
+                    DataCell(
+                      IconButton(
+                        icon: const Icon(Icons.update, size: 20),
+                        tooltip: 'Update Status',
+                        onPressed: () => showDialog(
+                          context: context,
+                          builder: (_) =>
+                              _UpdateTransferStatusDialog(transferId: t.id),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
-          )
-          .toList(),
+              )
+              .toList(),
+        );
+      },
     );
   }
 }
@@ -797,10 +806,9 @@ class _OutOfStockTab extends ConsumerWidget {
           context: context,
           columns: const [
             DataColumn(label: Text('Item')),
-            DataColumn(label: Text('Unit')),
-            DataColumn(label: Text('Location')),
-            DataColumn(label: Text('Reason')),
-            DataColumn(label: Text('Reported')),
+            DataColumn(label: Text('SKU')),
+            DataColumn(label: Text('Category')),
+            DataColumn(label: Text('Status')),
           ],
           rows: items
               .map(
@@ -808,14 +816,13 @@ class _OutOfStockTab extends ConsumerWidget {
                   cells: [
                     DataCell(
                       Text(
-                        oos.itemName,
+                        oos.name,
                         style: const TextStyle(fontWeight: FontWeight.w500),
                       ),
                     ),
-                    DataCell(Text(oos.unitName ?? '---')),
-                    DataCell(Text(oos.locationName ?? '---')),
-                    DataCell(Text(oos.reason ?? '---')),
-                    DataCell(Text(_fmt(oos.reportedAt))),
+                    DataCell(Text(oos.sku ?? '---')),
+                    DataCell(Text(oos.category ?? '---')),
+                    DataCell(Text(oos.isActive ? 'Active' : 'Inactive')),
                   ],
                 ),
               )
@@ -1808,24 +1815,24 @@ class _CreateRecipeDialogState extends ConsumerState<_CreateRecipeDialog> {
         .where((e) => e.itemId != null && e.quantityCtrl.text.isNotEmpty)
         .map(
           (e) => RecipeIngredientCreate(
-            itemId: e.itemId!,
+            ingredientId: e.itemId!,
             quantity: double.tryParse(e.quantityCtrl.text) ?? 0,
-            notes: e.notesCtrl.text.trim().isEmpty
-                ? null
-                : e.notesCtrl.text.trim(),
           ),
         )
         .toList();
 
+    final store = ref.read(selectedStoreProvider);
     final recipe = await ref
         .read(createRecipeActionProvider.notifier)
         .createRecipe(
           RecipeCreate(
+            storeId: store?.id ?? '',
+            productId: '',
             name: _nameCtrl.text.trim(),
             description: _descCtrl.text.trim().isEmpty
                 ? null
                 : _descCtrl.text.trim(),
-            ingredients: ingredients,
+            lines: ingredients,
           ),
         );
 
@@ -2105,18 +2112,17 @@ class _ViewEditRecipeDialogState extends ConsumerState<_ViewEditRecipeDialog> {
                       style: Theme.of(context).textTheme.titleSmall,
                     ),
                     const SizedBox(height: 8),
-                    if (recipe.ingredients.isEmpty)
+                    if (recipe.lines.isEmpty)
                       const Text('No ingredients defined.'),
-                    ...recipe.ingredients.map(
+                    ...recipe.lines.map(
                       (ing) => ListTile(
                         dense: true,
                         contentPadding: EdgeInsets.zero,
                         leading: const Icon(Icons.circle, size: 8),
                         title: Text(
-                          '${ing.itemName ?? ing.itemId}  x  ${ing.quantity}'
-                          '${ing.unitName != null ? " ${ing.unitName}" : ""}',
+                          '${ing.ingredientId}  x  ${ing.quantity}'
+                          '${ing.unitId != null ? " (unit: ${ing.unitId})" : ""}',
                         ),
-                        subtitle: ing.notes != null ? Text(ing.notes!) : null,
                       ),
                     ),
                   ],

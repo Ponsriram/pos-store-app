@@ -218,6 +218,99 @@ class OrderRepository {
     }
   }
 
+  Future<Either<Failure, List<Map<String, dynamic>>>> getOrderPayments(
+    String orderId,
+  ) async {
+    try {
+      if (!await connectionChecker.isConnected) {
+        return const Left(Failure('No internet connection.'));
+      }
+
+      final uri = _buildUri(ApiEndpoints.orderPaymentsByOrder(orderId));
+      final response = await client.get(uri);
+
+      if (response.statusCode != 200) {
+        final message = parsePydanticError(response.body);
+        return Left(Failure(message, response.statusCode));
+      }
+
+      final List<dynamic> data = jsonDecode(response.body) as List<dynamic>;
+      return Right(
+        data.map((e) => (e as Map<String, dynamic>)).toList(growable: false),
+      );
+    } on SocketException {
+      return const Left(Failure('No internet connection.'));
+    } catch (e) {
+      return Left(Failure('Failed to fetch payments: $e'));
+    }
+  }
+
+  Future<Either<Failure, Map<String, dynamic>>> updatePayment({
+    required String paymentId,
+    String? paymentMethod,
+    double? amount,
+    double? tipAmount,
+    String? reference,
+  }) async {
+    try {
+      if (!await connectionChecker.isConnected) {
+        return const Left(Failure('No internet connection.'));
+      }
+
+      final body = <String, dynamic>{};
+      if (paymentMethod != null) body['payment_method'] = paymentMethod;
+      if (amount != null) body['amount'] = amount;
+      if (tipAmount != null) body['tip_amount'] = tipAmount;
+      if (reference != null) body['reference'] = reference;
+
+      final uri = _buildUri(ApiEndpoints.orderPaymentById(paymentId));
+      final response = await client.put(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(body),
+      );
+
+      if (response.statusCode != 200) {
+        final message = parsePydanticError(response.body);
+        return Left(Failure(message, response.statusCode));
+      }
+
+      return Right(jsonDecode(response.body) as Map<String, dynamic>);
+    } on SocketException {
+      return const Left(Failure('No internet connection.'));
+    } catch (e) {
+      return Left(Failure('Failed to update payment: $e'));
+    }
+  }
+
+  Future<Either<Failure, Map<String, dynamic>>> createRefund(
+    RefundCreate refund,
+  ) async {
+    try {
+      if (!await connectionChecker.isConnected) {
+        return const Left(Failure('No internet connection.'));
+      }
+
+      final uri = _buildUri('${ApiEndpoints.orderPayments}/refund');
+      final response = await client.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(refund.toJson()),
+      );
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        final message = parsePydanticError(response.body);
+        return Left(Failure(message, response.statusCode));
+      }
+
+      return Right(jsonDecode(response.body) as Map<String, dynamic>);
+    } on SocketException {
+      return const Left(Failure('No internet connection.'));
+    } catch (e) {
+      return Left(Failure('Failed to create refund: $e'));
+    }
+  }
+
   // -------------------------------------------------------------------
   // Order item CRUD
   // -------------------------------------------------------------------

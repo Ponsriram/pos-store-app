@@ -77,6 +77,7 @@ abstract class OrderCreate with _$OrderCreate {
     @JsonKey(name: 'employee_id') String? employeeId,
     @JsonKey(name: 'terminal_id') String? terminalId,
     @JsonKey(name: 'table_number') int? tableNumber,
+    @JsonKey(name: 'shift_id') String? shiftId,
     @JsonKey(name: 'order_type') @Default('dine_in') String orderType,
     @Default('pos') String channel,
     @JsonKey(name: 'discount_amount') @Default(0) double discountAmount,
@@ -114,6 +115,18 @@ abstract class PaymentCreate with _$PaymentCreate {
 
   factory PaymentCreate.fromJson(Map<String, dynamic> json) =>
       _$PaymentCreateFromJson(json);
+}
+
+@freezed
+abstract class RefundCreate with _$RefundCreate {
+  const factory RefundCreate({
+    @JsonKey(name: 'payment_id') required String paymentId,
+    required double amount,
+    required String reason,
+  }) = _RefundCreate;
+
+  factory RefundCreate.fromJson(Map<String, dynamic> json) =>
+      _$RefundCreateFromJson(json);
 }
 
 @freezed

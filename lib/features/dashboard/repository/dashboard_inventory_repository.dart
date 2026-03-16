@@ -39,6 +39,54 @@ class DashboardInventoryRepository {
     return uri;
   }
 
+  String _mapTransferStatusToBackend(String status) {
+    return switch (status) {
+      'pending' => 'requested',
+      'in_transit' => 'shipped',
+      'completed' => 'received',
+      'cancelled' => 'cancelled',
+      _ => status,
+    };
+  }
+
+  String _mapTransferStatusFromBackend(String status) {
+    return switch (status) {
+      'requested' => 'pending',
+      'approved' => 'pending',
+      'shipped' => 'in_transit',
+      'received' => 'completed',
+      _ => status,
+    };
+  }
+
+  InventoryTransfer _mapTransferFromBackend(
+    Map<String, dynamic> data,
+    String storeId,
+  ) {
+    final lines = (data['lines'] as List<dynamic>? ?? const []);
+    final firstLine = lines.isNotEmpty
+        ? lines.first as Map<String, dynamic>
+        : <String, dynamic>{};
+
+    return InventoryTransfer(
+      id: data['id'] as String,
+      storeId: storeId.isNotEmpty
+          ? storeId
+          : ((data['from_store_id'] as String?) ?? ''),
+      fromLocationId: (data['from_store_id'] as String?) ?? '',
+      toLocationId: (data['to_store_id'] as String?) ?? '',
+      itemId: (firstLine['item_id'] as String?) ?? '',
+      quantity: (firstLine['quantity'] as num?)?.toDouble() ?? 0,
+      status: _mapTransferStatusFromBackend(
+        (data['status'] as String?) ?? 'pending',
+      ),
+      notes: data['notes'] as String?,
+      createdAt: data['created_at'] == null
+          ? null
+          : DateTime.parse(data['created_at'] as String),
+    );
+  }
+
   // ---- Items ----
 
   Future<Either<Failure, List<InventoryItem>>> getItems({
@@ -438,18 +486,47 @@ class DashboardInventoryRepository {
       if (!await connectionChecker.isConnected) {
         return const Left(Failure('No internet connection.'));
       }
+      final itemsResult = await getItems(storeId: transfer.storeId);
+      final items = itemsResult.fold((_) => <InventoryItem>[], (data) => data);
+      final item = items.where((i) => i.id == transfer.itemId).firstOrNull;
+      if (item == null) {
+        return const Left(
+          Failure('Selected inventory item is invalid for transfer.'),
+        );
+      }
+
       final uri = _buildUri(ApiEndpoints.inventoryTransfers);
+      final notesPrefix =
+          'from:${transfer.fromLocationId}|to:${transfer.toLocationId}';
+      final notes = transfer.notes == null || transfer.notes!.trim().isEmpty
+          ? notesPrefix
+          : '$notesPrefix | ${transfer.notes!.trim()}';
+
+      final payload = {
+        'from_store_id': transfer.storeId,
+        'to_store_id': transfer.storeId,
+        'notes': notes,
+        'lines': [
+          {
+            'item_id': transfer.itemId,
+            'quantity': transfer.quantity,
+            'unit_id': item.unitId,
+          },
+        ],
+      };
+
       final response = await client.post(
         uri,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(transfer.toJson()),
+        body: jsonEncode(payload),
       );
       if (response.statusCode != 200 && response.statusCode != 201) {
         final message = parsePydanticError(response.body);
         return Left(Failure(message, response.statusCode));
       }
-      final created = InventoryTransfer.fromJson(
+      final created = _mapTransferFromBackend(
         jsonDecode(response.body) as Map<String, dynamic>,
+        transfer.storeId,
       );
       return Right(created);
     } on SocketException {
@@ -471,20 +548,56 @@ class DashboardInventoryRepository {
       final response = await client.put(
         uri,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(TransferStatusUpdate(status: status).toJson()),
+        body: jsonEncode(
+          TransferStatusUpdate(
+            status: _mapTransferStatusToBackend(status),
+          ).toJson(),
+        ),
       );
       if (response.statusCode != 200) {
         final message = parsePydanticError(response.body);
         return Left(Failure(message, response.statusCode));
       }
-      final updated = InventoryTransfer.fromJson(
+      final updated = _mapTransferFromBackend(
         jsonDecode(response.body) as Map<String, dynamic>,
+        '',
       );
       return Right(updated);
     } on SocketException {
       return const Left(Failure('No internet connection.'));
     } catch (e) {
       return Left(Failure('Failed to update transfer status: $e'));
+    }
+  }
+
+  Future<Either<Failure, List<InventoryTransfer>>> getTransfers({
+    required String storeId,
+  }) async {
+    try {
+      if (!await connectionChecker.isConnected) {
+        return const Left(Failure('No internet connection.'));
+      }
+
+      final uri = _buildUri(ApiEndpoints.inventoryTransfers, {
+        'store_id': storeId,
+      });
+      final response = await client.get(uri);
+      if (response.statusCode != 200) {
+        final message = parsePydanticError(response.body);
+        return Left(Failure(message, response.statusCode));
+      }
+
+      final List<dynamic> data = jsonDecode(response.body) as List<dynamic>;
+      final transfers = data
+          .map(
+            (e) => _mapTransferFromBackend(e as Map<String, dynamic>, storeId),
+          )
+          .toList();
+      return Right(transfers);
+    } on SocketException {
+      return const Left(Failure('No internet connection.'));
+    } catch (e) {
+      return Left(Failure('Failed to fetch transfers: $e'));
     }
   }
 

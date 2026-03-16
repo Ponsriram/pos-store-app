@@ -44,19 +44,61 @@ class OrdersList extends _$OrdersList {
     final orderType = ref.watch(orderTypeFilterProvider);
     final statusFilter = ref.watch(orderStatusFilterProvider);
     final repo = ref.read(orderRepositoryProvider);
+
+    // Map composite UI filters to server-side status values
+    String? serverStatus;
+    if (statusFilter != null &&
+        statusFilter != 'in_kitchen' &&
+        statusFilter != 'ready') {
+      serverStatus = statusFilter;
+    }
+
     final result = await repo.getOrders(
       storeId: store.id,
       orderType: orderType,
-      status: statusFilter,
+      status: serverStatus,
     );
-    return result.fold(
-      (failure) => throw Exception(failure.message),
-      (orders) => orders,
-    );
+    return result.fold((failure) => throw Exception(failure.message), (orders) {
+      if (statusFilter == null) return orders;
+      // Client-side filtering only needed for composite filters
+      if (statusFilter == 'in_kitchen' || statusFilter == 'ready') {
+        return orders
+            .where((o) => _matchesStatusFilter(o, statusFilter))
+            .toList(growable: false);
+      }
+      return orders;
+    });
   }
 
   Future<void> refresh() async {
     ref.invalidateSelf();
+  }
+
+  bool _matchesStatusFilter(Order order, String filter) {
+    final status = order.status.toLowerCase();
+    final payment = order.paymentStatus.toLowerCase();
+
+    // Always treat fully paid orders as paid in Orders view.
+    if (filter == 'paid') {
+      return payment == 'completed' || status == 'paid';
+    }
+
+    return switch (filter) {
+      'open' => status == 'open' && payment != 'completed',
+      'in_kitchen' => status == 'sent_to_kitchen' || status == 'preparing',
+      'ready' =>
+        payment != 'completed' &&
+            {
+              'ready',
+              'served',
+              'handed_over',
+              'out_for_delivery',
+              'delivered',
+              'completed',
+            }.contains(status),
+      'cancelled' => status == 'cancelled',
+      _ => status == filter,
+    };
   }
 }
 

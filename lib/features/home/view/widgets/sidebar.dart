@@ -22,12 +22,7 @@ class AppSidebar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isDarkAsync = ref.watch(isDarkModeProvider);
-    final isDark = isDarkAsync.when(
-      data: (v) => v,
-      loading: () => false,
-      error: (e, st) => false,
-    );
+    final isDark = ref.watch(isDarkModeProvider);
 
     final roleStr = ref.watch(employeeRoleProvider);
     final role = EmployeeRoleType.fromString(roleStr);
@@ -84,7 +79,7 @@ class AppSidebar extends ConsumerWidget {
             icon: isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
             tooltip: isDark ? 'Light Mode' : 'Dark Mode',
             onTap: () {
-              ref.read(appThemeProvider.notifier).toggleTheme(!isDark);
+              ref.read(isDarkModeProvider.notifier).toggle();
             },
           ),
           _SidebarActionItem(
@@ -115,7 +110,26 @@ class AppSidebar extends ConsumerWidget {
             icon: Icons.logout,
             tooltip: 'Logout',
             onTap: () async {
-              await ref.read(authViewModelProvider.notifier).logout();
+              final confirmed = await showDialog<bool>(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Text('Logout'),
+                  content: const Text('Are you sure you want to logout?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(ctx).pop(false),
+                      child: const Text('Cancel'),
+                    ),
+                    FilledButton(
+                      onPressed: () => Navigator.of(ctx).pop(true),
+                      child: const Text('Logout'),
+                    ),
+                  ],
+                ),
+              );
+              if (confirmed == true) {
+                await ref.read(currentUserIdProvider.notifier).clearUser();
+              }
             },
           ),
           const SizedBox(height: 16),

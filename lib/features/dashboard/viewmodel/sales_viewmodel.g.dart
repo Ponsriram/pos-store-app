@@ -33,7 +33,7 @@ final class SalesOrderListProvider
   SalesOrderList create() => SalesOrderList();
 }
 
-String _$salesOrderListHash() => r'263039c04e8b57b9a770d194ac7d789ba87da539';
+String _$salesOrderListHash() => r'917916698069b3abb36682a9406e18bf627068a2';
 
 abstract class _$SalesOrderList extends $AsyncNotifier<List<Order>> {
   FutureOr<List<Order>> build();
