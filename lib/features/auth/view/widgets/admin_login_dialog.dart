@@ -60,9 +60,7 @@ class _AdminLoginDialogState extends ConsumerState<AdminLoginDialog> {
         },
         (user) async {
           // Admin login successful — grant full access
-          await ref
-              .read(employeeRoleProvider.notifier)
-              .setRole('admin');
+          await ref.read(employeeRoleProvider.notifier).setRole('admin');
 
           await ref.read(appBootstrapProvider.notifier).reevaluate();
 
@@ -83,7 +81,7 @@ class _AdminLoginDialogState extends ConsumerState<AdminLoginDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = ref.watch(appThemeProvider);
+    final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
     return Dialog(
