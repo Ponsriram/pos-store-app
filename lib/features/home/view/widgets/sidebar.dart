@@ -29,12 +29,10 @@ class AppSidebar extends ConsumerWidget {
     final pages = PermissionService.allowedPages(role);
 
     // Split into main pages and utility pages
-    final mainPages = pages
-        .where((p) => p != AppPage.help && p != AppPage.settings)
-        .toList();
-    final utilPages = pages
-        .where((p) => p == AppPage.help || p == AppPage.settings)
-        .toList();
+    final mainPages = pages.where((p) =>
+        p != AppPage.help && p != AppPage.settings).toList();
+    final utilPages = pages.where((p) =>
+        p == AppPage.help || p == AppPage.settings).toList();
 
     return Container(
       width: 72,
@@ -130,7 +128,7 @@ class AppSidebar extends ConsumerWidget {
                 ),
               );
               if (confirmed == true) {
-                await ref.read(authViewModelProvider.notifier).logout();
+                await ref.read(currentUserIdProvider.notifier).clearUser();
               }
             },
           ),

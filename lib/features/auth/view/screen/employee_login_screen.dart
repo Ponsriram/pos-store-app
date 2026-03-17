@@ -92,7 +92,7 @@ class _EmployeeLoginScreenState extends ConsumerState<EmployeeLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final theme = ref.watch(appThemeProvider);
     final colors = theme.colorScheme;
     // Assuming custom colors are extracted or standard colorScheme is used
     final background = colors.surface;

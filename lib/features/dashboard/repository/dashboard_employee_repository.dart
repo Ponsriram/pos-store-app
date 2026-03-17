@@ -79,9 +79,7 @@ class DashboardEmployeeRepository {
         return const Left(Failure('No internet connection.'));
       }
 
-      final uri = _buildUri(ApiEndpoints.employees, {
-        'store_id': employee.storeId,
-      });
+      final uri = _buildUri(ApiEndpoints.employees);
       final response = await client.post(
         uri,
         headers: {'Content-Type': 'application/json'},
