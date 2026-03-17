@@ -37,7 +37,6 @@ class AuthRepository {
   Future<Either<Failure, AuthResponse>> login({
     required String email,
     required String password,
-    String? terminalId,
   }) async {
     log('AuthRepository: login called for $email');
 
@@ -47,16 +46,10 @@ class AuthRepository {
       }
 
       final uri = _buildUri(ApiEndpoints.login);
-      final requestBody = {
-        'email': email,
-        'password': password,
-        if (terminalId != null) 'terminal_id': terminalId,
-      };
-
       final response = await client.post(
         uri,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(requestBody),
+        body: jsonEncode({'email': email, 'password': password}),
       );
 
       if (response.statusCode != 200) {

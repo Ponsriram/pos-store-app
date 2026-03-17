@@ -6,6 +6,5 @@ import 'package:http_interceptor/http_interceptor.dart';
 import 'core/database/app_database.dart';
 import 'core/network/connection_checker.dart';
 import 'core/network/http_interceptor.dart';
-import 'core/storage/local_storage.dart';
 
 part 'init_dependencies.main.dart';

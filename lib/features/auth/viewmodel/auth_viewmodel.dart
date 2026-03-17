@@ -7,7 +7,6 @@ import '../../../core/database/app_database.dart' hide User;
 import '../../../core/model/user.dart';
 import '../../../core/provider/current_user_provider.dart';
 import '../../../init_dependencies.dart';
-import '../provider/auth_provider.dart';
 import '../repository/auth_repository.dart';
 
 part 'auth_viewmodel.g.dart';
@@ -69,17 +68,7 @@ class AuthViewModel extends _$AuthViewModel {
 
     if (!ref.mounted) return;
 
-    // Clear selected store
-    await ref.read(selectedStoreIdProvider.notifier).clear();
-
-    // Clear terminal registration
-    await ref.read(terminalIdProvider.notifier).clear();
-
     await ref.read(currentUserIdProvider.notifier).clearUser();
-
-    // Re-evaluate bootstrap to show login screen
-    await ref.read(appBootstrapProvider.notifier).reevaluate();
-
     state = null;
   }
 }

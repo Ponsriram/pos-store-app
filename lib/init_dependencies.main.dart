@@ -9,11 +9,6 @@ Future<void> initDependencies() async {
   // Database (registered first — interceptor needs it)
   serviceLocator.registerLazySingleton<AppDatabase>(() => AppDatabase());
 
-  // Local storage wrapper
-  serviceLocator.registerLazySingleton<LocalStorage>(
-    () => LocalStorage(serviceLocator<AppDatabase>()),
-  );
-
   // Network — every repository uses this intercepted client automatically
   serviceLocator.registerSingleton<http.Client>(
     InterceptedClient.build(interceptors: [HttpRequestInterceptor()]),

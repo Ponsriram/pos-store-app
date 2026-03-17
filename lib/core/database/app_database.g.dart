@@ -732,90 +732,6 @@ class $AppSettingsTable extends AppSettings
     requiredDuringInsert: false,
     defaultValue: const Constant('en'),
   );
-  static const VerificationMeta _selectedStoreIdMeta = const VerificationMeta(
-    'selectedStoreId',
-  );
-  @override
-  late final GeneratedColumn<String> selectedStoreId = GeneratedColumn<String>(
-    'selected_store_id',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(''),
-  );
-  static const VerificationMeta _terminalIdMeta = const VerificationMeta(
-    'terminalId',
-  );
-  @override
-  late final GeneratedColumn<String> terminalId = GeneratedColumn<String>(
-    'terminal_id',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(''),
-  );
-  static const VerificationMeta _terminalTokenMeta = const VerificationMeta(
-    'terminalToken',
-  );
-  @override
-  late final GeneratedColumn<String> terminalToken = GeneratedColumn<String>(
-    'terminal_token',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(''),
-  );
-  static const VerificationMeta _employeeTokenMeta = const VerificationMeta(
-    'employeeToken',
-  );
-  @override
-  late final GeneratedColumn<String> employeeToken = GeneratedColumn<String>(
-    'employee_token',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(''),
-  );
-  static const VerificationMeta _employeeIdMeta = const VerificationMeta(
-    'employeeId',
-  );
-  @override
-  late final GeneratedColumn<String> employeeId = GeneratedColumn<String>(
-    'employee_id',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(''),
-  );
-  static const VerificationMeta _employeeNameMeta = const VerificationMeta(
-    'employeeName',
-  );
-  @override
-  late final GeneratedColumn<String> employeeName = GeneratedColumn<String>(
-    'employee_name',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(''),
-  );
-  static const VerificationMeta _employeeRoleMeta = const VerificationMeta(
-    'employeeRole',
-  );
-  @override
-  late final GeneratedColumn<String> employeeRole = GeneratedColumn<String>(
-    'employee_role',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(''),
-  );
   static const VerificationMeta _updatedAtMeta = const VerificationMeta(
     'updatedAt',
   );
@@ -835,13 +751,6 @@ class $AppSettingsTable extends AppSettings
     isScreenshotBlocked,
     serverEndpoint,
     locale,
-    selectedStoreId,
-    terminalId,
-    terminalToken,
-    employeeToken,
-    employeeId,
-    employeeName,
-    employeeRole,
     updatedAt,
   ];
   @override
@@ -901,63 +810,6 @@ class $AppSettingsTable extends AppSettings
         locale.isAcceptableOrUnknown(data['locale']!, _localeMeta),
       );
     }
-    if (data.containsKey('selected_store_id')) {
-      context.handle(
-        _selectedStoreIdMeta,
-        selectedStoreId.isAcceptableOrUnknown(
-          data['selected_store_id']!,
-          _selectedStoreIdMeta,
-        ),
-      );
-    }
-    if (data.containsKey('terminal_id')) {
-      context.handle(
-        _terminalIdMeta,
-        terminalId.isAcceptableOrUnknown(data['terminal_id']!, _terminalIdMeta),
-      );
-    }
-    if (data.containsKey('terminal_token')) {
-      context.handle(
-        _terminalTokenMeta,
-        terminalToken.isAcceptableOrUnknown(
-          data['terminal_token']!,
-          _terminalTokenMeta,
-        ),
-      );
-    }
-    if (data.containsKey('employee_token')) {
-      context.handle(
-        _employeeTokenMeta,
-        employeeToken.isAcceptableOrUnknown(
-          data['employee_token']!,
-          _employeeTokenMeta,
-        ),
-      );
-    }
-    if (data.containsKey('employee_id')) {
-      context.handle(
-        _employeeIdMeta,
-        employeeId.isAcceptableOrUnknown(data['employee_id']!, _employeeIdMeta),
-      );
-    }
-    if (data.containsKey('employee_name')) {
-      context.handle(
-        _employeeNameMeta,
-        employeeName.isAcceptableOrUnknown(
-          data['employee_name']!,
-          _employeeNameMeta,
-        ),
-      );
-    }
-    if (data.containsKey('employee_role')) {
-      context.handle(
-        _employeeRoleMeta,
-        employeeRole.isAcceptableOrUnknown(
-          data['employee_role']!,
-          _employeeRoleMeta,
-        ),
-      );
-    }
     if (data.containsKey('updated_at')) {
       context.handle(
         _updatedAtMeta,
@@ -997,34 +849,6 @@ class $AppSettingsTable extends AppSettings
         DriftSqlType.string,
         data['${effectivePrefix}locale'],
       )!,
-      selectedStoreId: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}selected_store_id'],
-      )!,
-      terminalId: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}terminal_id'],
-      )!,
-      terminalToken: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}terminal_token'],
-      )!,
-      employeeToken: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}employee_token'],
-      )!,
-      employeeId: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}employee_id'],
-      )!,
-      employeeName: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}employee_name'],
-      )!,
-      employeeRole: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}employee_role'],
-      )!,
       updatedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
@@ -1045,13 +869,6 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
   final bool isScreenshotBlocked;
   final String serverEndpoint;
   final String locale;
-  final String selectedStoreId;
-  final String terminalId;
-  final String terminalToken;
-  final String employeeToken;
-  final String employeeId;
-  final String employeeName;
-  final String employeeRole;
   final DateTime? updatedAt;
   const AppSetting({
     required this.id,
@@ -1060,13 +877,6 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     required this.isScreenshotBlocked,
     required this.serverEndpoint,
     required this.locale,
-    required this.selectedStoreId,
-    required this.terminalId,
-    required this.terminalToken,
-    required this.employeeToken,
-    required this.employeeId,
-    required this.employeeName,
-    required this.employeeRole,
     this.updatedAt,
   });
   @override
@@ -1078,13 +888,6 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     map['is_screenshot_blocked'] = Variable<bool>(isScreenshotBlocked);
     map['server_endpoint'] = Variable<String>(serverEndpoint);
     map['locale'] = Variable<String>(locale);
-    map['selected_store_id'] = Variable<String>(selectedStoreId);
-    map['terminal_id'] = Variable<String>(terminalId);
-    map['terminal_token'] = Variable<String>(terminalToken);
-    map['employee_token'] = Variable<String>(employeeToken);
-    map['employee_id'] = Variable<String>(employeeId);
-    map['employee_name'] = Variable<String>(employeeName);
-    map['employee_role'] = Variable<String>(employeeRole);
     if (!nullToAbsent || updatedAt != null) {
       map['updated_at'] = Variable<DateTime>(updatedAt);
     }
@@ -1099,13 +902,6 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
       isScreenshotBlocked: Value(isScreenshotBlocked),
       serverEndpoint: Value(serverEndpoint),
       locale: Value(locale),
-      selectedStoreId: Value(selectedStoreId),
-      terminalId: Value(terminalId),
-      terminalToken: Value(terminalToken),
-      employeeToken: Value(employeeToken),
-      employeeId: Value(employeeId),
-      employeeName: Value(employeeName),
-      employeeRole: Value(employeeRole),
       updatedAt: updatedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(updatedAt),
@@ -1126,13 +922,6 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
       ),
       serverEndpoint: serializer.fromJson<String>(json['serverEndpoint']),
       locale: serializer.fromJson<String>(json['locale']),
-      selectedStoreId: serializer.fromJson<String>(json['selectedStoreId']),
-      terminalId: serializer.fromJson<String>(json['terminalId']),
-      terminalToken: serializer.fromJson<String>(json['terminalToken']),
-      employeeToken: serializer.fromJson<String>(json['employeeToken']),
-      employeeId: serializer.fromJson<String>(json['employeeId']),
-      employeeName: serializer.fromJson<String>(json['employeeName']),
-      employeeRole: serializer.fromJson<String>(json['employeeRole']),
       updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
     );
   }
@@ -1146,13 +935,6 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
       'isScreenshotBlocked': serializer.toJson<bool>(isScreenshotBlocked),
       'serverEndpoint': serializer.toJson<String>(serverEndpoint),
       'locale': serializer.toJson<String>(locale),
-      'selectedStoreId': serializer.toJson<String>(selectedStoreId),
-      'terminalId': serializer.toJson<String>(terminalId),
-      'terminalToken': serializer.toJson<String>(terminalToken),
-      'employeeToken': serializer.toJson<String>(employeeToken),
-      'employeeId': serializer.toJson<String>(employeeId),
-      'employeeName': serializer.toJson<String>(employeeName),
-      'employeeRole': serializer.toJson<String>(employeeRole),
       'updatedAt': serializer.toJson<DateTime?>(updatedAt),
     };
   }
@@ -1164,13 +946,6 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     bool? isScreenshotBlocked,
     String? serverEndpoint,
     String? locale,
-    String? selectedStoreId,
-    String? terminalId,
-    String? terminalToken,
-    String? employeeToken,
-    String? employeeId,
-    String? employeeName,
-    String? employeeRole,
     Value<DateTime?> updatedAt = const Value.absent(),
   }) => AppSetting(
     id: id ?? this.id,
@@ -1179,13 +954,6 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     isScreenshotBlocked: isScreenshotBlocked ?? this.isScreenshotBlocked,
     serverEndpoint: serverEndpoint ?? this.serverEndpoint,
     locale: locale ?? this.locale,
-    selectedStoreId: selectedStoreId ?? this.selectedStoreId,
-    terminalId: terminalId ?? this.terminalId,
-    terminalToken: terminalToken ?? this.terminalToken,
-    employeeToken: employeeToken ?? this.employeeToken,
-    employeeId: employeeId ?? this.employeeId,
-    employeeName: employeeName ?? this.employeeName,
-    employeeRole: employeeRole ?? this.employeeRole,
     updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
   );
   AppSetting copyWithCompanion(AppSettingsCompanion data) {
@@ -1204,27 +972,6 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
           ? data.serverEndpoint.value
           : this.serverEndpoint,
       locale: data.locale.present ? data.locale.value : this.locale,
-      selectedStoreId: data.selectedStoreId.present
-          ? data.selectedStoreId.value
-          : this.selectedStoreId,
-      terminalId: data.terminalId.present
-          ? data.terminalId.value
-          : this.terminalId,
-      terminalToken: data.terminalToken.present
-          ? data.terminalToken.value
-          : this.terminalToken,
-      employeeToken: data.employeeToken.present
-          ? data.employeeToken.value
-          : this.employeeToken,
-      employeeId: data.employeeId.present
-          ? data.employeeId.value
-          : this.employeeId,
-      employeeName: data.employeeName.present
-          ? data.employeeName.value
-          : this.employeeName,
-      employeeRole: data.employeeRole.present
-          ? data.employeeRole.value
-          : this.employeeRole,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -1238,13 +985,6 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
           ..write('isScreenshotBlocked: $isScreenshotBlocked, ')
           ..write('serverEndpoint: $serverEndpoint, ')
           ..write('locale: $locale, ')
-          ..write('selectedStoreId: $selectedStoreId, ')
-          ..write('terminalId: $terminalId, ')
-          ..write('terminalToken: $terminalToken, ')
-          ..write('employeeToken: $employeeToken, ')
-          ..write('employeeId: $employeeId, ')
-          ..write('employeeName: $employeeName, ')
-          ..write('employeeRole: $employeeRole, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -1258,13 +998,6 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     isScreenshotBlocked,
     serverEndpoint,
     locale,
-    selectedStoreId,
-    terminalId,
-    terminalToken,
-    employeeToken,
-    employeeId,
-    employeeName,
-    employeeRole,
     updatedAt,
   );
   @override
@@ -1277,13 +1010,6 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
           other.isScreenshotBlocked == this.isScreenshotBlocked &&
           other.serverEndpoint == this.serverEndpoint &&
           other.locale == this.locale &&
-          other.selectedStoreId == this.selectedStoreId &&
-          other.terminalId == this.terminalId &&
-          other.terminalToken == this.terminalToken &&
-          other.employeeToken == this.employeeToken &&
-          other.employeeId == this.employeeId &&
-          other.employeeName == this.employeeName &&
-          other.employeeRole == this.employeeRole &&
           other.updatedAt == this.updatedAt);
 }
 
@@ -1294,13 +1020,6 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
   final Value<bool> isScreenshotBlocked;
   final Value<String> serverEndpoint;
   final Value<String> locale;
-  final Value<String> selectedStoreId;
-  final Value<String> terminalId;
-  final Value<String> terminalToken;
-  final Value<String> employeeToken;
-  final Value<String> employeeId;
-  final Value<String> employeeName;
-  final Value<String> employeeRole;
   final Value<DateTime?> updatedAt;
   const AppSettingsCompanion({
     this.id = const Value.absent(),
@@ -1309,13 +1028,6 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     this.isScreenshotBlocked = const Value.absent(),
     this.serverEndpoint = const Value.absent(),
     this.locale = const Value.absent(),
-    this.selectedStoreId = const Value.absent(),
-    this.terminalId = const Value.absent(),
-    this.terminalToken = const Value.absent(),
-    this.employeeToken = const Value.absent(),
-    this.employeeId = const Value.absent(),
-    this.employeeName = const Value.absent(),
-    this.employeeRole = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
   AppSettingsCompanion.insert({
@@ -1325,13 +1037,6 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     this.isScreenshotBlocked = const Value.absent(),
     this.serverEndpoint = const Value.absent(),
     this.locale = const Value.absent(),
-    this.selectedStoreId = const Value.absent(),
-    this.terminalId = const Value.absent(),
-    this.terminalToken = const Value.absent(),
-    this.employeeToken = const Value.absent(),
-    this.employeeId = const Value.absent(),
-    this.employeeName = const Value.absent(),
-    this.employeeRole = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
   static Insertable<AppSetting> custom({
@@ -1341,13 +1046,6 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     Expression<bool>? isScreenshotBlocked,
     Expression<String>? serverEndpoint,
     Expression<String>? locale,
-    Expression<String>? selectedStoreId,
-    Expression<String>? terminalId,
-    Expression<String>? terminalToken,
-    Expression<String>? employeeToken,
-    Expression<String>? employeeId,
-    Expression<String>? employeeName,
-    Expression<String>? employeeRole,
     Expression<DateTime>? updatedAt,
   }) {
     return RawValuesInsertable({
@@ -1358,13 +1056,6 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
         'is_screenshot_blocked': isScreenshotBlocked,
       if (serverEndpoint != null) 'server_endpoint': serverEndpoint,
       if (locale != null) 'locale': locale,
-      if (selectedStoreId != null) 'selected_store_id': selectedStoreId,
-      if (terminalId != null) 'terminal_id': terminalId,
-      if (terminalToken != null) 'terminal_token': terminalToken,
-      if (employeeToken != null) 'employee_token': employeeToken,
-      if (employeeId != null) 'employee_id': employeeId,
-      if (employeeName != null) 'employee_name': employeeName,
-      if (employeeRole != null) 'employee_role': employeeRole,
       if (updatedAt != null) 'updated_at': updatedAt,
     });
   }
@@ -1376,13 +1067,6 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     Value<bool>? isScreenshotBlocked,
     Value<String>? serverEndpoint,
     Value<String>? locale,
-    Value<String>? selectedStoreId,
-    Value<String>? terminalId,
-    Value<String>? terminalToken,
-    Value<String>? employeeToken,
-    Value<String>? employeeId,
-    Value<String>? employeeName,
-    Value<String>? employeeRole,
     Value<DateTime?>? updatedAt,
   }) {
     return AppSettingsCompanion(
@@ -1392,13 +1076,6 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
       isScreenshotBlocked: isScreenshotBlocked ?? this.isScreenshotBlocked,
       serverEndpoint: serverEndpoint ?? this.serverEndpoint,
       locale: locale ?? this.locale,
-      selectedStoreId: selectedStoreId ?? this.selectedStoreId,
-      terminalId: terminalId ?? this.terminalId,
-      terminalToken: terminalToken ?? this.terminalToken,
-      employeeToken: employeeToken ?? this.employeeToken,
-      employeeId: employeeId ?? this.employeeId,
-      employeeName: employeeName ?? this.employeeName,
-      employeeRole: employeeRole ?? this.employeeRole,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
@@ -1424,27 +1101,6 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
     if (locale.present) {
       map['locale'] = Variable<String>(locale.value);
     }
-    if (selectedStoreId.present) {
-      map['selected_store_id'] = Variable<String>(selectedStoreId.value);
-    }
-    if (terminalId.present) {
-      map['terminal_id'] = Variable<String>(terminalId.value);
-    }
-    if (terminalToken.present) {
-      map['terminal_token'] = Variable<String>(terminalToken.value);
-    }
-    if (employeeToken.present) {
-      map['employee_token'] = Variable<String>(employeeToken.value);
-    }
-    if (employeeId.present) {
-      map['employee_id'] = Variable<String>(employeeId.value);
-    }
-    if (employeeName.present) {
-      map['employee_name'] = Variable<String>(employeeName.value);
-    }
-    if (employeeRole.present) {
-      map['employee_role'] = Variable<String>(employeeRole.value);
-    }
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
     }
@@ -1460,13 +1116,6 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
           ..write('isScreenshotBlocked: $isScreenshotBlocked, ')
           ..write('serverEndpoint: $serverEndpoint, ')
           ..write('locale: $locale, ')
-          ..write('selectedStoreId: $selectedStoreId, ')
-          ..write('terminalId: $terminalId, ')
-          ..write('terminalToken: $terminalToken, ')
-          ..write('employeeToken: $employeeToken, ')
-          ..write('employeeId: $employeeId, ')
-          ..write('employeeName: $employeeName, ')
-          ..write('employeeRole: $employeeRole, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
@@ -1804,13 +1453,6 @@ typedef $$AppSettingsTableCreateCompanionBuilder =
       Value<bool> isScreenshotBlocked,
       Value<String> serverEndpoint,
       Value<String> locale,
-      Value<String> selectedStoreId,
-      Value<String> terminalId,
-      Value<String> terminalToken,
-      Value<String> employeeToken,
-      Value<String> employeeId,
-      Value<String> employeeName,
-      Value<String> employeeRole,
       Value<DateTime?> updatedAt,
     });
 typedef $$AppSettingsTableUpdateCompanionBuilder =
@@ -1821,13 +1463,6 @@ typedef $$AppSettingsTableUpdateCompanionBuilder =
       Value<bool> isScreenshotBlocked,
       Value<String> serverEndpoint,
       Value<String> locale,
-      Value<String> selectedStoreId,
-      Value<String> terminalId,
-      Value<String> terminalToken,
-      Value<String> employeeToken,
-      Value<String> employeeId,
-      Value<String> employeeName,
-      Value<String> employeeRole,
       Value<DateTime?> updatedAt,
     });
 
@@ -1867,41 +1502,6 @@ class $$AppSettingsTableFilterComposer
 
   ColumnFilters<String> get locale => $composableBuilder(
     column: $table.locale,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get selectedStoreId => $composableBuilder(
-    column: $table.selectedStoreId,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get terminalId => $composableBuilder(
-    column: $table.terminalId,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get terminalToken => $composableBuilder(
-    column: $table.terminalToken,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get employeeToken => $composableBuilder(
-    column: $table.employeeToken,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get employeeId => $composableBuilder(
-    column: $table.employeeId,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get employeeName => $composableBuilder(
-    column: $table.employeeName,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get employeeRole => $composableBuilder(
-    column: $table.employeeRole,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1950,41 +1550,6 @@ class $$AppSettingsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get selectedStoreId => $composableBuilder(
-    column: $table.selectedStoreId,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get terminalId => $composableBuilder(
-    column: $table.terminalId,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get terminalToken => $composableBuilder(
-    column: $table.terminalToken,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get employeeToken => $composableBuilder(
-    column: $table.employeeToken,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get employeeId => $composableBuilder(
-    column: $table.employeeId,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get employeeName => $composableBuilder(
-    column: $table.employeeName,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get employeeRole => $composableBuilder(
-    column: $table.employeeRole,
-    builder: (column) => ColumnOrderings(column),
-  );
-
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
@@ -2025,41 +1590,6 @@ class $$AppSettingsTableAnnotationComposer
 
   GeneratedColumn<String> get locale =>
       $composableBuilder(column: $table.locale, builder: (column) => column);
-
-  GeneratedColumn<String> get selectedStoreId => $composableBuilder(
-    column: $table.selectedStoreId,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get terminalId => $composableBuilder(
-    column: $table.terminalId,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get terminalToken => $composableBuilder(
-    column: $table.terminalToken,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get employeeToken => $composableBuilder(
-    column: $table.employeeToken,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get employeeId => $composableBuilder(
-    column: $table.employeeId,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get employeeName => $composableBuilder(
-    column: $table.employeeName,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get employeeRole => $composableBuilder(
-    column: $table.employeeRole,
-    builder: (column) => column,
-  );
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
@@ -2102,13 +1632,6 @@ class $$AppSettingsTableTableManager
                 Value<bool> isScreenshotBlocked = const Value.absent(),
                 Value<String> serverEndpoint = const Value.absent(),
                 Value<String> locale = const Value.absent(),
-                Value<String> selectedStoreId = const Value.absent(),
-                Value<String> terminalId = const Value.absent(),
-                Value<String> terminalToken = const Value.absent(),
-                Value<String> employeeToken = const Value.absent(),
-                Value<String> employeeId = const Value.absent(),
-                Value<String> employeeName = const Value.absent(),
-                Value<String> employeeRole = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => AppSettingsCompanion(
                 id: id,
@@ -2117,13 +1640,6 @@ class $$AppSettingsTableTableManager
                 isScreenshotBlocked: isScreenshotBlocked,
                 serverEndpoint: serverEndpoint,
                 locale: locale,
-                selectedStoreId: selectedStoreId,
-                terminalId: terminalId,
-                terminalToken: terminalToken,
-                employeeToken: employeeToken,
-                employeeId: employeeId,
-                employeeName: employeeName,
-                employeeRole: employeeRole,
                 updatedAt: updatedAt,
               ),
           createCompanionCallback:
@@ -2134,13 +1650,6 @@ class $$AppSettingsTableTableManager
                 Value<bool> isScreenshotBlocked = const Value.absent(),
                 Value<String> serverEndpoint = const Value.absent(),
                 Value<String> locale = const Value.absent(),
-                Value<String> selectedStoreId = const Value.absent(),
-                Value<String> terminalId = const Value.absent(),
-                Value<String> terminalToken = const Value.absent(),
-                Value<String> employeeToken = const Value.absent(),
-                Value<String> employeeId = const Value.absent(),
-                Value<String> employeeName = const Value.absent(),
-                Value<String> employeeRole = const Value.absent(),
                 Value<DateTime?> updatedAt = const Value.absent(),
               }) => AppSettingsCompanion.insert(
                 id: id,
@@ -2149,13 +1658,6 @@ class $$AppSettingsTableTableManager
                 isScreenshotBlocked: isScreenshotBlocked,
                 serverEndpoint: serverEndpoint,
                 locale: locale,
-                selectedStoreId: selectedStoreId,
-                terminalId: terminalId,
-                terminalToken: terminalToken,
-                employeeToken: employeeToken,
-                employeeId: employeeId,
-                employeeName: employeeName,
-                employeeRole: employeeRole,
                 updatedAt: updatedAt,
               ),
           withReferenceMapper: (p0) => p0

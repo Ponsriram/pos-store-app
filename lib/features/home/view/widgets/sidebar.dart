@@ -1,38 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/permissions/permission_service.dart';
-import '../../../../core/permissions/role_permissions.dart';
+import '../../../../core/provider/current_user_provider.dart';
 import '../../../../core/provider/theme_provider.dart';
-import '../../../auth/provider/auth_provider.dart';
-import '../../../auth/viewmodel/auth_viewmodel.dart';
 
 class AppSidebar extends ConsumerWidget {
   final int selectedIndex;
   final ValueChanged<int> onItemSelected;
-  final VoidCallback onLockPos;
 
   const AppSidebar({
     super.key,
     required this.selectedIndex,
     required this.onItemSelected,
-    required this.onLockPos,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = ref.watch(isDarkModeProvider);
-
-    final roleStr = ref.watch(employeeRoleProvider);
-    final role = EmployeeRoleType.fromString(roleStr);
-    final pages = PermissionService.allowedPages(role);
-
-    // Split into main pages and utility pages
-    final mainPages = pages.where((p) =>
-        p != AppPage.help && p != AppPage.settings).toList();
-    final utilPages = pages.where((p) =>
-        p == AppPage.help || p == AppPage.settings).toList();
 
     return Container(
       width: 72,
@@ -60,21 +45,41 @@ class AppSidebar extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 24),
-
-          // ── Main nav items (driven by role permissions) ──────────
-          for (int i = 0; i < mainPages.length; i++)
-            _SidebarItem(
-              icon: mainPages[i].icon,
-              selectedIcon: mainPages[i].selectedIcon,
-              index: i,
-              selectedIndex: selectedIndex,
-              onTap: () => onItemSelected(i),
-              tooltip: mainPages[i].label,
-            ),
-
+          // Nav items
+          _SidebarItem(
+            icon: Icons.home_outlined,
+            selectedIcon: Icons.home,
+            index: 0,
+            selectedIndex: selectedIndex,
+            onTap: () => onItemSelected(0),
+            tooltip: 'Home',
+          ),
+          _SidebarItem(
+            icon: Icons.grid_view_outlined,
+            selectedIcon: Icons.grid_view,
+            index: 1,
+            selectedIndex: selectedIndex,
+            onTap: () => onItemSelected(1),
+            tooltip: 'Dashboard',
+          ),
+          _SidebarItem(
+            icon: Icons.receipt_long_outlined,
+            selectedIcon: Icons.receipt_long,
+            index: 2,
+            selectedIndex: selectedIndex,
+            onTap: () => onItemSelected(2),
+            tooltip: 'Orders',
+          ),
+          _SidebarItem(
+            icon: Icons.restaurant_menu_outlined,
+            selectedIcon: Icons.restaurant_menu,
+            index: 3,
+            selectedIndex: selectedIndex,
+            onTap: () => onItemSelected(3),
+            tooltip: 'Kitchen (KOT)',
+          ),
           const Spacer(),
-
-          // ── Actions ─────────────────────────────────────────────
+          // Dark mode toggle
           _SidebarActionItem(
             icon: isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
             tooltip: isDark ? 'Light Mode' : 'Dark Mode',
@@ -85,26 +90,27 @@ class AppSidebar extends ConsumerWidget {
           _SidebarActionItem(
             icon: Icons.refresh,
             tooltip: 'Refresh',
-            onTap: () => onItemSelected(-1),
+            onTap: () {
+              // Trigger a refresh of all data — handled by parent
+              onItemSelected(-1);
+            },
           ),
-
           const Divider(indent: 16, endIndent: 16),
-
-          // ── Utility pages (Help, Settings) ──────────────────────
-          for (int i = 0; i < utilPages.length; i++)
-            _SidebarItem(
-              icon: utilPages[i].icon,
-              selectedIcon: utilPages[i].selectedIcon,
-              index: mainPages.length + i,
-              selectedIndex: selectedIndex,
-              onTap: () => onItemSelected(mainPages.length + i),
-              tooltip: utilPages[i].label,
-            ),
-
-          _SidebarActionItem(
-            icon: Icons.lock_outline,
-            tooltip: 'Lock POS',
-            onTap: onLockPos,
+          _SidebarItem(
+            icon: Icons.help_outline,
+            selectedIcon: Icons.help,
+            index: 4,
+            selectedIndex: selectedIndex,
+            onTap: () => onItemSelected(4),
+            tooltip: 'Help',
+          ),
+          _SidebarItem(
+            icon: Icons.settings_outlined,
+            selectedIcon: Icons.settings,
+            index: 5,
+            selectedIndex: selectedIndex,
+            onTap: () => onItemSelected(5),
+            tooltip: 'Settings',
           ),
           _SidebarActionItem(
             icon: Icons.logout,

@@ -35,13 +35,6 @@ class AppSettings extends Table {
       boolean().withDefault(const Constant(false))();
   TextColumn get serverEndpoint => text().withDefault(const Constant(''))();
   TextColumn get locale => text().withDefault(const Constant('en'))();
-  TextColumn get selectedStoreId => text().withDefault(const Constant(''))();
-  TextColumn get terminalId => text().withDefault(const Constant(''))();
-  TextColumn get terminalToken => text().withDefault(const Constant(''))();
-  TextColumn get employeeToken => text().withDefault(const Constant(''))();
-  TextColumn get employeeId => text().withDefault(const Constant(''))();
-  TextColumn get employeeName => text().withDefault(const Constant(''))();
-  TextColumn get employeeRole => text().withDefault(const Constant(''))();
   DateTimeColumn get updatedAt => dateTime().nullable()();
 }
 
@@ -50,7 +43,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -64,49 +57,6 @@ class AppDatabase extends _$AppDatabase {
         await m.addColumn(users, users.role);
         await m.addColumn(users, users.isActive);
         await m.createTable(appSettings);
-      }
-      if (from < 3) {
-        await m.addColumn(appSettings, appSettings.selectedStoreId);
-      }
-      if (from < 4) {
-        try {
-          await m.addColumn(appSettings, appSettings.terminalId);
-        } catch (e) {
-          // ignore: avoid_print
-          print('Column terminal_id might already exist: $e');
-        }
-        try {
-          await m.addColumn(appSettings, appSettings.terminalToken);
-        } catch (e) {
-          // ignore: avoid_print
-          print('Column terminalToken might already exist: $e');
-        }
-      }
-      if (from < 5) {
-        try {
-          await m.addColumn(appSettings, appSettings.employeeToken);
-        } catch (e) {
-          // ignore: avoid_print
-          print('Column employeeToken might already exist: $e');
-        }
-        try {
-          await m.addColumn(appSettings, appSettings.employeeId);
-        } catch (e) {
-          // ignore: avoid_print
-          print('Column employeeId might already exist: $e');
-        }
-        try {
-          await m.addColumn(appSettings, appSettings.employeeName);
-        } catch (e) {
-          // ignore: avoid_print
-          print('Column employeeName might already exist: $e');
-        }
-        try {
-          await m.addColumn(appSettings, appSettings.employeeRole);
-        } catch (e) {
-          // ignore: avoid_print
-          print('Column employeeRole might already exist: $e');
-        }
       }
     },
   );
@@ -241,123 +191,6 @@ class AppDatabase extends _$AppDatabase {
     await (update(appSettings)..where((t) => t.id.equals(1))).write(
       AppSettingsCompanion(
         locale: Value(locale),
-        updatedAt: Value(DateTime.now()),
-      ),
-    );
-  }
-
-  // =====================================================================
-  // SELECTED STORE OPERATIONS
-  // =====================================================================
-
-  Future<String?> getSelectedStoreId() async {
-    final settings = await getSettings();
-    final id = settings.selectedStoreId;
-    return (id.isEmpty) ? null : id;
-  }
-
-  Future<void> setSelectedStoreId(String storeId) async {
-    await getSettings(); // ensure row exists
-    await (update(appSettings)..where((t) => t.id.equals(1))).write(
-      AppSettingsCompanion(
-        selectedStoreId: Value(storeId),
-        updatedAt: Value(DateTime.now()),
-      ),
-    );
-  }
-
-  Future<void> clearSelectedStoreId() async {
-    await (update(appSettings)..where((t) => t.id.equals(1))).write(
-      AppSettingsCompanion(
-        selectedStoreId: const Value(''),
-        updatedAt: Value(DateTime.now()),
-      ),
-    );
-  }
-
-  // =====================================================================
-  // TERMINAL OPERATIONS
-  // =====================================================================
-
-  Future<String?> getTerminalId() async {
-    final settings = await getSettings();
-    final id = settings.terminalId;
-    return (id.isEmpty) ? null : id;
-  }
-
-  Future<String?> getTerminalToken() async {
-    final settings = await getSettings();
-    final token = settings.terminalToken;
-    return (token.isEmpty) ? null : token;
-  }
-
-  Future<void> setTerminal(String terminalId, String terminalToken) async {
-    await getSettings(); // ensure row exists
-    await (update(appSettings)..where((t) => t.id.equals(1))).write(
-      AppSettingsCompanion(
-        terminalId: Value(terminalId),
-        terminalToken: Value(terminalToken),
-        updatedAt: Value(DateTime.now()),
-      ),
-    );
-  }
-
-  Future<void> clearTerminal() async {
-    await (update(appSettings)..where((t) => t.id.equals(1))).write(
-      AppSettingsCompanion(
-        terminalId: const Value(''),
-        terminalToken: const Value(''),
-        updatedAt: Value(DateTime.now()),
-      ),
-    );
-  }
-  // =====================================================================
-  // EMPLOYEE OPERATIONS
-  // =====================================================================
-
-  Future<String?> getEmployeeToken() async {
-    final settings = await getSettings();
-    final token = settings.employeeToken;
-    return (token.isEmpty) ? null : token;
-  }
-
-  Future<String?> getEmployeeId() async {
-    final settings = await getSettings();
-    final id = settings.employeeId;
-    return (id.isEmpty) ? null : id;
-  }
-
-  Future<String?> getEmployeeRole() async {
-    final settings = await getSettings();
-    final role = settings.employeeRole;
-    return (role.isEmpty) ? null : role;
-  }
-
-  Future<void> setEmployee(
-    String employeeId,
-    String employeeToken,
-    String employeeName,
-    String employeeRole,
-  ) async {
-    await getSettings(); // ensure row exists
-    await (update(appSettings)..where((t) => t.id.equals(1))).write(
-      AppSettingsCompanion(
-        employeeId: Value(employeeId),
-        employeeToken: Value(employeeToken),
-        employeeName: Value(employeeName),
-        employeeRole: Value(employeeRole),
-        updatedAt: Value(DateTime.now()),
-      ),
-    );
-  }
-
-  Future<void> clearEmployee() async {
-    await (update(appSettings)..where((t) => t.id.equals(1))).write(
-      AppSettingsCompanion(
-        employeeId: const Value(''),
-        employeeToken: const Value(''),
-        employeeName: const Value(''),
-        employeeRole: const Value(''),
         updatedAt: Value(DateTime.now()),
       ),
     );
