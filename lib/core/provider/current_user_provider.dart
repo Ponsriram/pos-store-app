@@ -59,3 +59,19 @@ Future<String?> storedUserId(Ref ref) async {
   final user = await database.getLoggedInUser();
   return user?.id;
 }
+
+/// Provider for current user role
+@riverpod
+Future<String?> currentUserRole(Ref ref) async {
+  final database = serviceLocator<AppDatabase>();
+  final user = await database.getLoggedInUser();
+  return user?.role;
+}
+
+/// Provider for current user store ID
+@riverpod
+Future<String?> currentUserStoreId(Ref ref) async {
+  final database = serviceLocator<AppDatabase>();
+  final user = await database.getLoggedInUser();
+  return user?.storeId;
+}

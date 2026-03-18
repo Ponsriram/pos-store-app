@@ -148,3 +148,80 @@ final class StoredUserIdProvider
 }
 
 String _$storedUserIdHash() => r'18001c131e9f896e0d629fc3de0051870dd26744';
+
+/// Provider for current user role
+
+@ProviderFor(currentUserRole)
+final currentUserRoleProvider = CurrentUserRoleProvider._();
+
+/// Provider for current user role
+
+final class CurrentUserRoleProvider
+    extends $FunctionalProvider<AsyncValue<String?>, String?, FutureOr<String?>>
+    with $FutureModifier<String?>, $FutureProvider<String?> {
+  /// Provider for current user role
+  CurrentUserRoleProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'currentUserRoleProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$currentUserRoleHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<String?> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<String?> create(Ref ref) {
+    return currentUserRole(ref);
+  }
+}
+
+String _$currentUserRoleHash() => r'41441b298918008ef6cd674d5ed14811749f1cfe';
+
+/// Provider for current user store ID
+
+@ProviderFor(currentUserStoreId)
+final currentUserStoreIdProvider = CurrentUserStoreIdProvider._();
+
+/// Provider for current user store ID
+
+final class CurrentUserStoreIdProvider
+    extends $FunctionalProvider<AsyncValue<String?>, String?, FutureOr<String?>>
+    with $FutureModifier<String?>, $FutureProvider<String?> {
+  /// Provider for current user store ID
+  CurrentUserStoreIdProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'currentUserStoreIdProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$currentUserStoreIdHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<String?> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<String?> create(Ref ref) {
+    return currentUserStoreId(ref);
+  }
+}
+
+String _$currentUserStoreIdHash() =>
+    r'5306b835e6a3ed1777e73d2f515d29a3883da458';

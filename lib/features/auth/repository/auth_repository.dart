@@ -33,12 +33,12 @@ class AuthRepository {
     return Uri.parse('$base/$endpoint');
   }
 
-  /// Login with email and password.
+  /// Employee login with employee code and PIN.
   Future<Either<Failure, AuthResponse>> login({
-    required String email,
-    required String password,
+    required String employeeCode,
+    required String pin,
   }) async {
-    log('AuthRepository: login called for $email');
+    log('AuthRepository: employee login called for $employeeCode');
 
     try {
       if (!await connectionChecker.isConnected) {
@@ -49,8 +49,8 @@ class AuthRepository {
       final response = await client.post(
         uri,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'password': password}),
-      );
+        body: jsonEncode({'employee_code': employeeCode, 'pin': pin}),
+      ).timeout(const Duration(seconds: 10));
 
       if (response.statusCode != 200) {
         final message = parsePydanticError(response.body);
@@ -61,7 +61,7 @@ class AuthRepository {
         jsonDecode(response.body) as Map<String, dynamic>,
       );
 
-      log('AuthRepository: login successful for ${authResponse.user.id}');
+      log('AuthRepository: employee login successful for ${authResponse.employeeId}');
       return Right(authResponse);
     } on SocketException {
       return const Left(Failure('No internet connection.'));

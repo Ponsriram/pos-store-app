@@ -7,7 +7,7 @@ class ServerConstants {
 
 class ApiEndpoints {
   // Auth
-  static const String login = 'auth/login';
+  static const String login = 'auth/employee-login';
 
   // Stores
   static const String stores = 'stores';

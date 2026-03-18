@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:flutter/material.dart';
 import 'package:http_interceptor/http_interceptor.dart';
 
 import '../../init_dependencies.dart';
+import '../../main.dart';
 import '../database/app_database.dart';
+import '../../features/auth/view/screen/login_page.dart';
 
 /// Called when the server returns a 401 so the app can clear Riverpod state.
 /// Set this once during [initDependencies] before any network calls are made.
@@ -41,6 +44,15 @@ class HttpRequestInterceptor implements InterceptorContract {
           await db.logoutUser(user.id);
         }
         await onUnauthorized?.call();
+        
+        // Navigate to login page
+        final context = navigatorKey.currentContext;
+        if (context != null && context.mounted) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const LoginPage()),
+            (_) => false,
+          );
+        }
       } catch (e) {
         log('Interceptor: error during 401 logout — $e');
       }

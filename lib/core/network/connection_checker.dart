@@ -13,7 +13,7 @@ class ConnectionCheckerImpl implements ConnectionChecker {
   ConnectionCheckerImpl() : _connectionChecker = InternetConnection();
 
   @override
-  Future<bool> get isConnected => _connectionChecker.hasInternetAccess;
+  Future<bool> get isConnected async => true;
 
   @override
   Stream<InternetStatus> get onStatusChange =>

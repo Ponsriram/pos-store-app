@@ -97,7 +97,7 @@ class LoginLeftPanel extends StatelessWidget {
                 ),
                 const SizedBox(height: 14),
                 Text(
-                  'Manage orders, tables, and payments with a\nsingle, fast point-of-sale solution.',
+                  'Enter your employee credentials\nto start working.',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Colors.white.withValues(alpha: 0.75),
                     height: 1.6,

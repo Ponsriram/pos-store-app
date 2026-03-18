@@ -15,6 +15,7 @@ class Users extends Table {
   TextColumn get phone => text().withDefault(const Constant(''))();
   TextColumn get token => text().withDefault(const Constant(''))();
   TextColumn get role => text().withDefault(const Constant(''))();
+  TextColumn get storeId => text().withDefault(const Constant(''))();
   TextColumn get profileImage => text().withDefault(const Constant(''))();
   BoolColumn get isLoggedIn => boolean().withDefault(const Constant(false))();
   BoolColumn get isActive => boolean().withDefault(const Constant(true))();
@@ -43,7 +44,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -58,11 +59,14 @@ class AppDatabase extends _$AppDatabase {
         await m.addColumn(users, users.isActive);
         await m.createTable(appSettings);
       }
+      if (from < 3) {
+        await m.addColumn(users, users.storeId);
+      }
     },
   );
 
   static QueryExecutor _openConnection() {
-    return driftDatabase(name: 'noshpos_database');
+    return driftDatabase(name: 'noshpos_database_v3');
   }
 
   // =====================================================================
@@ -93,7 +97,7 @@ class AppDatabase extends _$AppDatabase {
 
   Future<void> logoutUser(String id) async {
     await (update(users)..where((t) => t.id.equals(id))).write(
-      const UsersCompanion(isLoggedIn: Value(false)),
+      const UsersCompanion(isLoggedIn: Value(false), token: Value('')),
     );
   }
 

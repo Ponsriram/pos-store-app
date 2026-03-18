@@ -8,9 +8,8 @@ abstract class User with _$User {
   const factory User({
     required String id,
     @Default('') String name,
-    @Default('') String email,
-    @Default('') String phone,
     @Default('') String role,
+    @JsonKey(name: 'store_id') @Default('') String storeId,
     @JsonKey(name: 'is_active') @Default(true) bool isActive,
     @JsonKey(name: 'created_at') DateTime? createdAt,
   }) = _User;

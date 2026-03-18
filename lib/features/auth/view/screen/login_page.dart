@@ -16,22 +16,23 @@ class LoginPage extends ConsumerStatefulWidget {
 
 class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
-  final _emailCtrl = TextEditingController();
-  final _passwordCtrl = TextEditingController();
-  bool _obscurePassword = true;
+  final _employeeCodeCtrl = TextEditingController();
+  final _pinCtrl = TextEditingController();
+  bool _obscurePin = true;
 
   @override
   void dispose() {
-    _emailCtrl.dispose();
-    _passwordCtrl.dispose();
+    _employeeCodeCtrl.dispose();
+    _pinCtrl.dispose();
     super.dispose();
   }
 
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
-    ref
-        .read(authViewModelProvider.notifier)
-        .login(email: _emailCtrl.text.trim(), password: _passwordCtrl.text);
+    ref.read(authViewModelProvider.notifier).login(
+      employeeCode: _employeeCodeCtrl.text.trim(),
+      pin: _pinCtrl.text,
+    );
   }
 
   @override
@@ -80,12 +81,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     constraints: const BoxConstraints(maxWidth: 420),
                     child: LoginForm(
                       formKey: _formKey,
-                      emailCtrl: _emailCtrl,
-                      passwordCtrl: _passwordCtrl,
-                      obscurePassword: _obscurePassword,
+                      employeeCodeCtrl: _employeeCodeCtrl,
+                      pinCtrl: _pinCtrl,
+                      obscurePin: _obscurePin,
                       isLoading: isLoading,
                       onToggleObscure: () => setState(() {
-                        _obscurePassword = !_obscurePassword;
+                        _obscurePin = !_obscurePin;
                       }),
                       onSubmit: _submit,
                     ),

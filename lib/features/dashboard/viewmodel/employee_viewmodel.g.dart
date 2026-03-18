@@ -33,7 +33,7 @@ final class EmployeeListProvider
   EmployeeList create() => EmployeeList();
 }
 
-String _$employeeListHash() => r'04c1fd3802cff72d14c083512362e458711bf384';
+String _$employeeListHash() => r'70886c84bd08c3a477aac6b02d2a6d4ed51c8487';
 
 abstract class _$EmployeeList extends $AsyncNotifier<List<Employee>> {
   FutureOr<List<Employee>> build();

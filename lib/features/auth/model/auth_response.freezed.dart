@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AuthResponse {
 
-@JsonKey(name: 'access_token') String get accessToken;@JsonKey(name: 'token_type') String get tokenType; User get user;
+@JsonKey(name: 'access_token') String get accessToken;@JsonKey(name: 'token_type') String get tokenType;@JsonKey(name: 'employee_id') String get employeeId;@JsonKey(name: 'employee_name') String get employeeName; String get role;@JsonKey(name: 'store_id') String get storeId;
 /// Create a copy of AuthResponse
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $AuthResponseCopyWith<AuthResponse> get copyWith => _$AuthResponseCopyWithImpl<A
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthResponse&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken)&&(identical(other.tokenType, tokenType) || other.tokenType == tokenType)&&(identical(other.user, user) || other.user == user));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is AuthResponse&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken)&&(identical(other.tokenType, tokenType) || other.tokenType == tokenType)&&(identical(other.employeeId, employeeId) || other.employeeId == employeeId)&&(identical(other.employeeName, employeeName) || other.employeeName == employeeName)&&(identical(other.role, role) || other.role == role)&&(identical(other.storeId, storeId) || other.storeId == storeId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,accessToken,tokenType,user);
+int get hashCode => Object.hash(runtimeType,accessToken,tokenType,employeeId,employeeName,role,storeId);
 
 @override
 String toString() {
-  return 'AuthResponse(accessToken: $accessToken, tokenType: $tokenType, user: $user)';
+  return 'AuthResponse(accessToken: $accessToken, tokenType: $tokenType, employeeId: $employeeId, employeeName: $employeeName, role: $role, storeId: $storeId)';
 }
 
 
@@ -48,11 +48,11 @@ abstract mixin class $AuthResponseCopyWith<$Res>  {
   factory $AuthResponseCopyWith(AuthResponse value, $Res Function(AuthResponse) _then) = _$AuthResponseCopyWithImpl;
 @useResult
 $Res call({
-@JsonKey(name: 'access_token') String accessToken,@JsonKey(name: 'token_type') String tokenType, User user
+@JsonKey(name: 'access_token') String accessToken,@JsonKey(name: 'token_type') String tokenType,@JsonKey(name: 'employee_id') String employeeId,@JsonKey(name: 'employee_name') String employeeName, String role,@JsonKey(name: 'store_id') String storeId
 });
 
 
-$UserCopyWith<$Res> get user;
+
 
 }
 /// @nodoc
@@ -65,24 +65,18 @@ class _$AuthResponseCopyWithImpl<$Res>
 
 /// Create a copy of AuthResponse
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? accessToken = null,Object? tokenType = null,Object? user = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? accessToken = null,Object? tokenType = null,Object? employeeId = null,Object? employeeName = null,Object? role = null,Object? storeId = null,}) {
   return _then(_self.copyWith(
 accessToken: null == accessToken ? _self.accessToken : accessToken // ignore: cast_nullable_to_non_nullable
 as String,tokenType: null == tokenType ? _self.tokenType : tokenType // ignore: cast_nullable_to_non_nullable
-as String,user: null == user ? _self.user : user // ignore: cast_nullable_to_non_nullable
-as User,
+as String,employeeId: null == employeeId ? _self.employeeId : employeeId // ignore: cast_nullable_to_non_nullable
+as String,employeeName: null == employeeName ? _self.employeeName : employeeName // ignore: cast_nullable_to_non_nullable
+as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as String,storeId: null == storeId ? _self.storeId : storeId // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
-/// Create a copy of AuthResponse
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$UserCopyWith<$Res> get user {
-  
-  return $UserCopyWith<$Res>(_self.user, (value) {
-    return _then(_self.copyWith(user: value));
-  });
-}
+
 }
 
 
@@ -164,10 +158,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'access_token')  String accessToken, @JsonKey(name: 'token_type')  String tokenType,  User user)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function(@JsonKey(name: 'access_token')  String accessToken, @JsonKey(name: 'token_type')  String tokenType, @JsonKey(name: 'employee_id')  String employeeId, @JsonKey(name: 'employee_name')  String employeeName,  String role, @JsonKey(name: 'store_id')  String storeId)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _AuthResponse() when $default != null:
-return $default(_that.accessToken,_that.tokenType,_that.user);case _:
+return $default(_that.accessToken,_that.tokenType,_that.employeeId,_that.employeeName,_that.role,_that.storeId);case _:
   return orElse();
 
 }
@@ -185,10 +179,10 @@ return $default(_that.accessToken,_that.tokenType,_that.user);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'access_token')  String accessToken, @JsonKey(name: 'token_type')  String tokenType,  User user)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function(@JsonKey(name: 'access_token')  String accessToken, @JsonKey(name: 'token_type')  String tokenType, @JsonKey(name: 'employee_id')  String employeeId, @JsonKey(name: 'employee_name')  String employeeName,  String role, @JsonKey(name: 'store_id')  String storeId)  $default,) {final _that = this;
 switch (_that) {
 case _AuthResponse():
-return $default(_that.accessToken,_that.tokenType,_that.user);case _:
+return $default(_that.accessToken,_that.tokenType,_that.employeeId,_that.employeeName,_that.role,_that.storeId);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -205,10 +199,10 @@ return $default(_that.accessToken,_that.tokenType,_that.user);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'access_token')  String accessToken, @JsonKey(name: 'token_type')  String tokenType,  User user)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function(@JsonKey(name: 'access_token')  String accessToken, @JsonKey(name: 'token_type')  String tokenType, @JsonKey(name: 'employee_id')  String employeeId, @JsonKey(name: 'employee_name')  String employeeName,  String role, @JsonKey(name: 'store_id')  String storeId)?  $default,) {final _that = this;
 switch (_that) {
 case _AuthResponse() when $default != null:
-return $default(_that.accessToken,_that.tokenType,_that.user);case _:
+return $default(_that.accessToken,_that.tokenType,_that.employeeId,_that.employeeName,_that.role,_that.storeId);case _:
   return null;
 
 }
@@ -220,12 +214,15 @@ return $default(_that.accessToken,_that.tokenType,_that.user);case _:
 @JsonSerializable()
 
 class _AuthResponse implements AuthResponse {
-  const _AuthResponse({@JsonKey(name: 'access_token') required this.accessToken, @JsonKey(name: 'token_type') this.tokenType = 'bearer', required this.user});
+  const _AuthResponse({@JsonKey(name: 'access_token') required this.accessToken, @JsonKey(name: 'token_type') this.tokenType = 'bearer', @JsonKey(name: 'employee_id') required this.employeeId, @JsonKey(name: 'employee_name') required this.employeeName, required this.role, @JsonKey(name: 'store_id') required this.storeId});
   factory _AuthResponse.fromJson(Map<String, dynamic> json) => _$AuthResponseFromJson(json);
 
 @override@JsonKey(name: 'access_token') final  String accessToken;
 @override@JsonKey(name: 'token_type') final  String tokenType;
-@override final  User user;
+@override@JsonKey(name: 'employee_id') final  String employeeId;
+@override@JsonKey(name: 'employee_name') final  String employeeName;
+@override final  String role;
+@override@JsonKey(name: 'store_id') final  String storeId;
 
 /// Create a copy of AuthResponse
 /// with the given fields replaced by the non-null parameter values.
@@ -240,16 +237,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthResponse&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken)&&(identical(other.tokenType, tokenType) || other.tokenType == tokenType)&&(identical(other.user, user) || other.user == user));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _AuthResponse&&(identical(other.accessToken, accessToken) || other.accessToken == accessToken)&&(identical(other.tokenType, tokenType) || other.tokenType == tokenType)&&(identical(other.employeeId, employeeId) || other.employeeId == employeeId)&&(identical(other.employeeName, employeeName) || other.employeeName == employeeName)&&(identical(other.role, role) || other.role == role)&&(identical(other.storeId, storeId) || other.storeId == storeId));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,accessToken,tokenType,user);
+int get hashCode => Object.hash(runtimeType,accessToken,tokenType,employeeId,employeeName,role,storeId);
 
 @override
 String toString() {
-  return 'AuthResponse(accessToken: $accessToken, tokenType: $tokenType, user: $user)';
+  return 'AuthResponse(accessToken: $accessToken, tokenType: $tokenType, employeeId: $employeeId, employeeName: $employeeName, role: $role, storeId: $storeId)';
 }
 
 
@@ -260,11 +257,11 @@ abstract mixin class _$AuthResponseCopyWith<$Res> implements $AuthResponseCopyWi
   factory _$AuthResponseCopyWith(_AuthResponse value, $Res Function(_AuthResponse) _then) = __$AuthResponseCopyWithImpl;
 @override @useResult
 $Res call({
-@JsonKey(name: 'access_token') String accessToken,@JsonKey(name: 'token_type') String tokenType, User user
+@JsonKey(name: 'access_token') String accessToken,@JsonKey(name: 'token_type') String tokenType,@JsonKey(name: 'employee_id') String employeeId,@JsonKey(name: 'employee_name') String employeeName, String role,@JsonKey(name: 'store_id') String storeId
 });
 
 
-@override $UserCopyWith<$Res> get user;
+
 
 }
 /// @nodoc
@@ -277,25 +274,19 @@ class __$AuthResponseCopyWithImpl<$Res>
 
 /// Create a copy of AuthResponse
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? accessToken = null,Object? tokenType = null,Object? user = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? accessToken = null,Object? tokenType = null,Object? employeeId = null,Object? employeeName = null,Object? role = null,Object? storeId = null,}) {
   return _then(_AuthResponse(
 accessToken: null == accessToken ? _self.accessToken : accessToken // ignore: cast_nullable_to_non_nullable
 as String,tokenType: null == tokenType ? _self.tokenType : tokenType // ignore: cast_nullable_to_non_nullable
-as String,user: null == user ? _self.user : user // ignore: cast_nullable_to_non_nullable
-as User,
+as String,employeeId: null == employeeId ? _self.employeeId : employeeId // ignore: cast_nullable_to_non_nullable
+as String,employeeName: null == employeeName ? _self.employeeName : employeeName // ignore: cast_nullable_to_non_nullable
+as String,role: null == role ? _self.role : role // ignore: cast_nullable_to_non_nullable
+as String,storeId: null == storeId ? _self.storeId : storeId // ignore: cast_nullable_to_non_nullable
+as String,
   ));
 }
 
-/// Create a copy of AuthResponse
-/// with the given fields replaced by the non-null parameter values.
-@override
-@pragma('vm:prefer-inline')
-$UserCopyWith<$Res> get user {
-  
-  return $UserCopyWith<$Res>(_self.user, (value) {
-    return _then(_self.copyWith(user: value));
-  });
-}
+
 }
 
 // dart format on

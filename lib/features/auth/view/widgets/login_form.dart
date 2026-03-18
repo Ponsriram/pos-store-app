@@ -4,18 +4,18 @@ class LoginForm extends StatelessWidget {
   const LoginForm({
     super.key,
     required this.formKey,
-    required this.emailCtrl,
-    required this.passwordCtrl,
-    required this.obscurePassword,
+    required this.employeeCodeCtrl,
+    required this.pinCtrl,
+    required this.obscurePin,
     required this.isLoading,
     required this.onToggleObscure,
     required this.onSubmit,
   });
 
   final GlobalKey<FormState> formKey;
-  final TextEditingController emailCtrl;
-  final TextEditingController passwordCtrl;
-  final bool obscurePassword;
+  final TextEditingController employeeCodeCtrl;
+  final TextEditingController pinCtrl;
+  final bool obscurePin;
   final bool isLoading;
   final VoidCallback onToggleObscure;
   final VoidCallback onSubmit;
@@ -32,7 +32,7 @@ class LoginForm extends StatelessWidget {
         children: [
           // ── Heading ───────────────────────────────────────────────────
           Text(
-            'Welcome back',
+            'Employee Login',
             style: theme.textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.w700,
               letterSpacing: -0.5,
@@ -41,16 +41,16 @@ class LoginForm extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'Sign in to your Nosh POS account',
+            'Enter your employee code and PIN to start',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 40),
 
-          // ── Email ─────────────────────────────────────────────────────
+          // ── Employee Code ──────────────────────────────────────────────
           Text(
-            'Email address',
+            'Employee Code',
             style: theme.textTheme.labelLarge?.copyWith(
               color: colorScheme.onSurface,
               fontWeight: FontWeight.w600,
@@ -58,27 +58,27 @@ class LoginForm extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           TextFormField(
-            controller: emailCtrl,
-            keyboardType: TextInputType.emailAddress,
+            controller: employeeCodeCtrl,
+            keyboardType: TextInputType.text,
             textInputAction: TextInputAction.next,
-            autofillHints: const [AutofillHints.email],
+            textCapitalization: TextCapitalization.characters,
             decoration: _fieldDecoration(
               context,
-              hint: 'you@example.com',
-              prefixIcon: Icons.mail_outline_rounded,
+              hint: 'e.g. EMP001',
+              prefixIcon: Icons.badge_outlined,
             ),
             validator: (v) {
-              if (v == null || v.trim().isEmpty) return 'Email is required';
-              final emailRegex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
-              if (!emailRegex.hasMatch(v.trim())) return 'Enter a valid email';
+              if (v == null || v.trim().isEmpty) {
+                return 'Employee code is required';
+              }
               return null;
             },
           ),
           const SizedBox(height: 20),
 
-          // ── Password ──────────────────────────────────────────────────
+          // ── PIN ────────────────────────────────────────────────────────
           Text(
-            'Password',
+            'PIN',
             style: theme.textTheme.labelLarge?.copyWith(
               color: colorScheme.onSurface,
               fontWeight: FontWeight.w600,
@@ -86,17 +86,18 @@ class LoginForm extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           TextFormField(
-            controller: passwordCtrl,
-            obscureText: obscurePassword,
+            controller: pinCtrl,
+            obscureText: obscurePin,
+            keyboardType: TextInputType.number,
             textInputAction: TextInputAction.done,
             onFieldSubmitted: (_) => onSubmit(),
             decoration: _fieldDecoration(
               context,
-              hint: '••••••••',
+              hint: '••••',
               prefixIcon: Icons.lock_outline_rounded,
               suffix: IconButton(
                 icon: Icon(
-                  obscurePassword
+                  obscurePin
                       ? Icons.visibility_off_outlined
                       : Icons.visibility_outlined,
                   size: 20,
@@ -106,8 +107,8 @@ class LoginForm extends StatelessWidget {
               ),
             ),
             validator: (v) {
-              if (v == null || v.isEmpty) return 'Password is required';
-              if (v.length < 6) return 'Password must be at least 6 characters';
+              if (v == null || v.isEmpty) return 'PIN is required';
+              if (v.length < 4) return 'PIN must be at least 4 digits';
               return null;
             },
           ),

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/rbac/role_permissions.dart';
+import '../../../../core/database/app_database.dart';
+import '../../../../init_dependencies.dart';
 import '../../viewmodel/home_viewmodel.dart';
 import '../../viewmodel/store_viewmodel.dart';
 import '../../../dashboard/view/screen/dashboard_page.dart';
@@ -20,10 +23,33 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  int _selectedIndex = 0;
+  AppPage? _selectedPage;
+  bool _isLoading = true;
 
-  void _onSidebarItemSelected(int index) {
-    if (index == -1) {
+  @override
+  void initState() {
+    super.initState();
+    _initDefaultPage();
+  }
+
+  Future<void> _initDefaultPage() async {
+    final db = serviceLocator<AppDatabase>();
+    final user = await db.getLoggedInUser();
+    if (mounted) {
+      if (user != null) {
+        final allowed = getAllowedPages(user.role);
+        setState(() {
+          _selectedPage = allowed.isNotEmpty ? allowed.first : AppPage.home;
+        });
+      } else {
+        setState(() => _selectedPage = AppPage.home);
+      }
+      setState(() => _isLoading = false);
+    }
+  }
+
+  void _onSidebarItemSelected(AppPage? page) {
+    if (page == null) {
       // Refresh action
       ref.invalidate(activeOrdersProvider);
       ref.invalidate(productListProvider);
@@ -39,36 +65,45 @@ class _HomePageState extends ConsumerState<HomePage> {
       }
       return;
     }
-    setState(() => _selectedIndex = index);
+    setState(() => _selectedPage = page);
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading || _selectedPage == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     return Scaffold(
       body: Row(
         children: [
           // Sidebar
           AppSidebar(
-            selectedIndex: _selectedIndex,
+            selectedPage: _selectedPage!,
             onItemSelected: _onSidebarItemSelected,
           ),
           // Content
-          Expanded(child: _buildContent()),
+          Expanded(child: _buildContent(_selectedPage!)),
         ],
       ),
     );
   }
 
-  Widget _buildContent() {
-    return switch (_selectedIndex) {
-      0 => const _PosScreen(),
-      1 => const DashboardPage(),
-      2 => const OrdersPage(),
-      3 => const KotPage(),
-      4 => const HelpPage(),
-      5 => const SettingsPage(),
-      _ => const _PosScreen(),
-    };
+  Widget _buildContent(AppPage page) {
+    switch (page) {
+      case AppPage.home:
+        return const _PosScreen();
+      case AppPage.dashboard:
+        return const DashboardPage();
+      case AppPage.orders:
+        return const OrdersPage();
+      case AppPage.kot:
+        return const KotPage();
+      case AppPage.help:
+        return const HelpPage();
+      case AppPage.settings:
+        return const SettingsPage();
+    }
   }
 }
 

@@ -8,6 +8,8 @@ import 'features/auth/view/screen/login_page.dart';
 import 'features/home/view/screen/home_page.dart';
 import 'init_dependencies.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initDependencies();
@@ -23,6 +25,7 @@ class MyApp extends ConsumerWidget {
     final isLoggedIn = userId != null;
     final themeMode = ref.watch(appThemeModeProvider);
     return MaterialApp(
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       title: 'Nosh POS',
       theme: lightTheme,
@@ -32,3 +35,4 @@ class MyApp extends ConsumerWidget {
     );
   }
 }
+

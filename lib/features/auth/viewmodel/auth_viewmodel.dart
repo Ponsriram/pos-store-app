@@ -18,13 +18,16 @@ class AuthViewModel extends _$AuthViewModel {
     return null;
   }
 
-  /// Login with email and password.
-  Future<void> login({required String email, required String password}) async {
+  /// Login with employee code and PIN.
+  Future<void> login({
+    required String employeeCode,
+    required String pin,
+  }) async {
     state = const AsyncValue.loading();
 
     final result = await ref
         .read(authRepositoryProvider)
-        .login(email: email, password: password);
+        .login(employeeCode: employeeCode, pin: pin);
 
     if (!ref.mounted) return;
 
@@ -33,7 +36,12 @@ class AuthViewModel extends _$AuthViewModel {
         state = AsyncValue.error(failure.message, StackTrace.current);
       },
       (authResponse) async {
-        final user = authResponse.user;
+        final user = User(
+          id: authResponse.employeeId,
+          name: authResponse.employeeName,
+          role: authResponse.role,
+          storeId: authResponse.storeId,
+        );
 
         // Persist user session to local DB
         final database = serviceLocator<AppDatabase>();
@@ -41,15 +49,14 @@ class AuthViewModel extends _$AuthViewModel {
           UsersCompanion.insert(
             id: user.id,
             name: Value(user.name),
-            email: Value(user.email),
-            phone: Value(user.phone),
             token: Value(authResponse.accessToken),
             role: Value(user.role),
+            storeId: Value(user.storeId),
             isLoggedIn: const Value(true),
-            isActive: Value(user.isActive),
+            isActive: const Value(true),
           ),
         );
-        log('AuthViewModel: user ${user.id} persisted to DB');
+        log('AuthViewModel: employee ${user.id} persisted to DB');
 
         ref.read(currentUserIdProvider.notifier).state = user.id;
         state = AsyncValue.data(user);
@@ -57,7 +64,22 @@ class AuthViewModel extends _$AuthViewModel {
     );
   }
 
-  /// Logout.
+  /// Lock terminal — clears auth token but keeps app state.
+  Future<void> lockTerminal() async {
+    final database = serviceLocator<AppDatabase>();
+    final dbUser = await database.getLoggedInUser();
+    if (dbUser != null) {
+      await database.logoutUser(dbUser.id);
+      log('AuthViewModel: terminal locked for ${dbUser.id}');
+    }
+
+    if (!ref.mounted) return;
+
+    ref.read(currentUserIdProvider.notifier).state = null;
+    state = null;
+  }
+
+  /// Full logout — clears everything.
   Future<void> logout() async {
     final database = serviceLocator<AppDatabase>();
     final dbUser = await database.getLoggedInUser();

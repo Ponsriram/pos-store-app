@@ -67,6 +67,18 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     requiredDuringInsert: false,
     defaultValue: const Constant(''),
   );
+  static const VerificationMeta _storeIdMeta = const VerificationMeta(
+    'storeId',
+  );
+  @override
+  late final GeneratedColumn<String> storeId = GeneratedColumn<String>(
+    'store_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
   static const VerificationMeta _profileImageMeta = const VerificationMeta(
     'profileImage',
   );
@@ -140,6 +152,7 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     phone,
     token,
     role,
+    storeId,
     profileImage,
     isLoggedIn,
     isActive,
@@ -191,6 +204,12 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
       context.handle(
         _roleMeta,
         role.isAcceptableOrUnknown(data['role']!, _roleMeta),
+      );
+    }
+    if (data.containsKey('store_id')) {
+      context.handle(
+        _storeIdMeta,
+        storeId.isAcceptableOrUnknown(data['store_id']!, _storeIdMeta),
       );
     }
     if (data.containsKey('profile_image')) {
@@ -262,6 +281,10 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
         DriftSqlType.string,
         data['${effectivePrefix}role'],
       )!,
+      storeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}store_id'],
+      )!,
       profileImage: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}profile_image'],
@@ -298,6 +321,7 @@ class User extends DataClass implements Insertable<User> {
   final String phone;
   final String token;
   final String role;
+  final String storeId;
   final String profileImage;
   final bool isLoggedIn;
   final bool isActive;
@@ -310,6 +334,7 @@ class User extends DataClass implements Insertable<User> {
     required this.phone,
     required this.token,
     required this.role,
+    required this.storeId,
     required this.profileImage,
     required this.isLoggedIn,
     required this.isActive,
@@ -325,6 +350,7 @@ class User extends DataClass implements Insertable<User> {
     map['phone'] = Variable<String>(phone);
     map['token'] = Variable<String>(token);
     map['role'] = Variable<String>(role);
+    map['store_id'] = Variable<String>(storeId);
     map['profile_image'] = Variable<String>(profileImage);
     map['is_logged_in'] = Variable<bool>(isLoggedIn);
     map['is_active'] = Variable<bool>(isActive);
@@ -343,6 +369,7 @@ class User extends DataClass implements Insertable<User> {
       phone: Value(phone),
       token: Value(token),
       role: Value(role),
+      storeId: Value(storeId),
       profileImage: Value(profileImage),
       isLoggedIn: Value(isLoggedIn),
       isActive: Value(isActive),
@@ -365,6 +392,7 @@ class User extends DataClass implements Insertable<User> {
       phone: serializer.fromJson<String>(json['phone']),
       token: serializer.fromJson<String>(json['token']),
       role: serializer.fromJson<String>(json['role']),
+      storeId: serializer.fromJson<String>(json['storeId']),
       profileImage: serializer.fromJson<String>(json['profileImage']),
       isLoggedIn: serializer.fromJson<bool>(json['isLoggedIn']),
       isActive: serializer.fromJson<bool>(json['isActive']),
@@ -382,6 +410,7 @@ class User extends DataClass implements Insertable<User> {
       'phone': serializer.toJson<String>(phone),
       'token': serializer.toJson<String>(token),
       'role': serializer.toJson<String>(role),
+      'storeId': serializer.toJson<String>(storeId),
       'profileImage': serializer.toJson<String>(profileImage),
       'isLoggedIn': serializer.toJson<bool>(isLoggedIn),
       'isActive': serializer.toJson<bool>(isActive),
@@ -397,6 +426,7 @@ class User extends DataClass implements Insertable<User> {
     String? phone,
     String? token,
     String? role,
+    String? storeId,
     String? profileImage,
     bool? isLoggedIn,
     bool? isActive,
@@ -409,6 +439,7 @@ class User extends DataClass implements Insertable<User> {
     phone: phone ?? this.phone,
     token: token ?? this.token,
     role: role ?? this.role,
+    storeId: storeId ?? this.storeId,
     profileImage: profileImage ?? this.profileImage,
     isLoggedIn: isLoggedIn ?? this.isLoggedIn,
     isActive: isActive ?? this.isActive,
@@ -423,6 +454,7 @@ class User extends DataClass implements Insertable<User> {
       phone: data.phone.present ? data.phone.value : this.phone,
       token: data.token.present ? data.token.value : this.token,
       role: data.role.present ? data.role.value : this.role,
+      storeId: data.storeId.present ? data.storeId.value : this.storeId,
       profileImage: data.profileImage.present
           ? data.profileImage.value
           : this.profileImage,
@@ -444,6 +476,7 @@ class User extends DataClass implements Insertable<User> {
           ..write('phone: $phone, ')
           ..write('token: $token, ')
           ..write('role: $role, ')
+          ..write('storeId: $storeId, ')
           ..write('profileImage: $profileImage, ')
           ..write('isLoggedIn: $isLoggedIn, ')
           ..write('isActive: $isActive, ')
@@ -461,6 +494,7 @@ class User extends DataClass implements Insertable<User> {
     phone,
     token,
     role,
+    storeId,
     profileImage,
     isLoggedIn,
     isActive,
@@ -477,6 +511,7 @@ class User extends DataClass implements Insertable<User> {
           other.phone == this.phone &&
           other.token == this.token &&
           other.role == this.role &&
+          other.storeId == this.storeId &&
           other.profileImage == this.profileImage &&
           other.isLoggedIn == this.isLoggedIn &&
           other.isActive == this.isActive &&
@@ -491,6 +526,7 @@ class UsersCompanion extends UpdateCompanion<User> {
   final Value<String> phone;
   final Value<String> token;
   final Value<String> role;
+  final Value<String> storeId;
   final Value<String> profileImage;
   final Value<bool> isLoggedIn;
   final Value<bool> isActive;
@@ -504,6 +540,7 @@ class UsersCompanion extends UpdateCompanion<User> {
     this.phone = const Value.absent(),
     this.token = const Value.absent(),
     this.role = const Value.absent(),
+    this.storeId = const Value.absent(),
     this.profileImage = const Value.absent(),
     this.isLoggedIn = const Value.absent(),
     this.isActive = const Value.absent(),
@@ -518,6 +555,7 @@ class UsersCompanion extends UpdateCompanion<User> {
     this.phone = const Value.absent(),
     this.token = const Value.absent(),
     this.role = const Value.absent(),
+    this.storeId = const Value.absent(),
     this.profileImage = const Value.absent(),
     this.isLoggedIn = const Value.absent(),
     this.isActive = const Value.absent(),
@@ -532,6 +570,7 @@ class UsersCompanion extends UpdateCompanion<User> {
     Expression<String>? phone,
     Expression<String>? token,
     Expression<String>? role,
+    Expression<String>? storeId,
     Expression<String>? profileImage,
     Expression<bool>? isLoggedIn,
     Expression<bool>? isActive,
@@ -546,6 +585,7 @@ class UsersCompanion extends UpdateCompanion<User> {
       if (phone != null) 'phone': phone,
       if (token != null) 'token': token,
       if (role != null) 'role': role,
+      if (storeId != null) 'store_id': storeId,
       if (profileImage != null) 'profile_image': profileImage,
       if (isLoggedIn != null) 'is_logged_in': isLoggedIn,
       if (isActive != null) 'is_active': isActive,
@@ -562,6 +602,7 @@ class UsersCompanion extends UpdateCompanion<User> {
     Value<String>? phone,
     Value<String>? token,
     Value<String>? role,
+    Value<String>? storeId,
     Value<String>? profileImage,
     Value<bool>? isLoggedIn,
     Value<bool>? isActive,
@@ -576,6 +617,7 @@ class UsersCompanion extends UpdateCompanion<User> {
       phone: phone ?? this.phone,
       token: token ?? this.token,
       role: role ?? this.role,
+      storeId: storeId ?? this.storeId,
       profileImage: profileImage ?? this.profileImage,
       isLoggedIn: isLoggedIn ?? this.isLoggedIn,
       isActive: isActive ?? this.isActive,
@@ -605,6 +647,9 @@ class UsersCompanion extends UpdateCompanion<User> {
     }
     if (role.present) {
       map['role'] = Variable<String>(role.value);
+    }
+    if (storeId.present) {
+      map['store_id'] = Variable<String>(storeId.value);
     }
     if (profileImage.present) {
       map['profile_image'] = Variable<String>(profileImage.value);
@@ -636,6 +681,7 @@ class UsersCompanion extends UpdateCompanion<User> {
           ..write('phone: $phone, ')
           ..write('token: $token, ')
           ..write('role: $role, ')
+          ..write('storeId: $storeId, ')
           ..write('profileImage: $profileImage, ')
           ..write('isLoggedIn: $isLoggedIn, ')
           ..write('isActive: $isActive, ')
@@ -1142,6 +1188,7 @@ typedef $$UsersTableCreateCompanionBuilder =
       Value<String> phone,
       Value<String> token,
       Value<String> role,
+      Value<String> storeId,
       Value<String> profileImage,
       Value<bool> isLoggedIn,
       Value<bool> isActive,
@@ -1157,6 +1204,7 @@ typedef $$UsersTableUpdateCompanionBuilder =
       Value<String> phone,
       Value<String> token,
       Value<String> role,
+      Value<String> storeId,
       Value<String> profileImage,
       Value<bool> isLoggedIn,
       Value<bool> isActive,
@@ -1200,6 +1248,11 @@ class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
 
   ColumnFilters<String> get role => $composableBuilder(
     column: $table.role,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get storeId => $composableBuilder(
+    column: $table.storeId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1268,6 +1321,11 @@ class $$UsersTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get storeId => $composableBuilder(
+    column: $table.storeId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get profileImage => $composableBuilder(
     column: $table.profileImage,
     builder: (column) => ColumnOrderings(column),
@@ -1320,6 +1378,9 @@ class $$UsersTableAnnotationComposer
 
   GeneratedColumn<String> get role =>
       $composableBuilder(column: $table.role, builder: (column) => column);
+
+  GeneratedColumn<String> get storeId =>
+      $composableBuilder(column: $table.storeId, builder: (column) => column);
 
   GeneratedColumn<String> get profileImage => $composableBuilder(
     column: $table.profileImage,
@@ -1375,6 +1436,7 @@ class $$UsersTableTableManager
                 Value<String> phone = const Value.absent(),
                 Value<String> token = const Value.absent(),
                 Value<String> role = const Value.absent(),
+                Value<String> storeId = const Value.absent(),
                 Value<String> profileImage = const Value.absent(),
                 Value<bool> isLoggedIn = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
@@ -1388,6 +1450,7 @@ class $$UsersTableTableManager
                 phone: phone,
                 token: token,
                 role: role,
+                storeId: storeId,
                 profileImage: profileImage,
                 isLoggedIn: isLoggedIn,
                 isActive: isActive,
@@ -1403,6 +1466,7 @@ class $$UsersTableTableManager
                 Value<String> phone = const Value.absent(),
                 Value<String> token = const Value.absent(),
                 Value<String> role = const Value.absent(),
+                Value<String> storeId = const Value.absent(),
                 Value<String> profileImage = const Value.absent(),
                 Value<bool> isLoggedIn = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
@@ -1416,6 +1480,7 @@ class $$UsersTableTableManager
                 phone: phone,
                 token: token,
                 role: role,
+                storeId: storeId,
                 profileImage: profileImage,
                 isLoggedIn: isLoggedIn,
                 isActive: isActive,
